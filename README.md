@@ -29,7 +29,7 @@ int main()
   assert(f.may_contain("hello") == true);
 
   // elements not inserted may incorrectly be identified as such with a
-  // false probability rate (FPR) which is a function of the array capacity,
+  // false positive rate (FPR) which is a function of the array capacity,
   // the number of bits set per element and generally how the boost::bloom::filter
   // was specified
   if(f.may_contain("bye")) { // likely false
@@ -69,7 +69,7 @@ the array.
 
 `BucketSize` can be any value other (and typically less) than `sizeof(Subfilter::value_type)`.
 When this is the case, subfilters in adjacent buckets act on overlapping byte ranges.
-Far from being a problem, this improves the resulting _false probability rate_ (FPR) of
+Far from being a problem, this improves the resulting _false positive rate_ (FPR) of
 the filter. The downside is that buckets won't be in general properly aligned in memory,
 which may result in more cache misses.
 
