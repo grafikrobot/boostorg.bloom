@@ -99,3 +99,61 @@ pretty much the same as that of [Apache Kudu](https://kudu.apache.org/)
 [`BlockBloomFilter`](https://github.com/apache/kudu/blob/master/src/kudu/util/block_bloom_filter_avx2.cc),
 but that implementation is fixed to `K'` = 8 whereas we accept
 any value between 1 and 8.
+
+## Estimating FPR
+
+For a classical Bloom filter, the theoretical false positive rate, under some simplifying assumptions,
+is given by
+
+$$FPR(n,m,k)=\left(1 - \left(1 - \frac{1}{m}\right)^{kn}\right)^k \approx \left(1 - e^{-kn/m}\right)^k \text{   for large } m,$$
+
+where $$n$$ is the number of elements inserted in the filter, $$m$$ its capacity in bits and $$k$$ the
+number of bits set per insertion (see a [derivation](https://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives)
+of this formula). For a given load $$c=n/m$$, the optimum $$k$$ is
+the integer closest to:
+
+$$k_{\text{opt}}=c\ln2,$$
+
+yielding a minimum attainable FPR of $$0.5^{c \cdot \ln 2} \approx 1/1.6168^{c}$$.
+
+In the case of a Boost.Bloom blocked filter of the form `filter<T, Hash, K, block<Block, K'>>`, we can extend
+the approach from [Putze et al.](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f376ff09a64b388bfcde2f5353e9ddb44033aac8)
+to derive the (approximate but very precise) formula:
+
+$$FPR_{\text{block}}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,kbn/m) \cdot FPR(i,b,k')\right)^{k},$$
+
+where
+
+$$\text{Pois}(i,\lambda)=\frac{\lambda^i e^{-\lambda}}{i!}$$
+
+is the probability mass function of a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution)
+with mean $$\lambda$$, and $$b$$ is the size of `Block` in bits. If we're using `multiblock<Block,K'>`, we have
+
+$$FPR_\text{multiblock}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,kk'bn/m) \cdot FPR(i,b,1)^{k'}\right)^{k}.$$
+
+As we have commented before, in general 
+
+$$FPR_\text{block}(n,m,b,k,k'), FPR_\text{multiblock}(n,m,b,k,k') \geq FPR(n,m,kk'),$$
+
+that is, block and multi-block filters have worse FPR than the classical filter for the same number of bits
+set per insertion, but they will be much faster. We have the particular case
+
+$$FPR_{\text{block}}(n,m,b,k,1)=FPR_{\text{multiblock}}(n,m,b,k,1)=FPR(n,m,k),$$
+
+which follows simply from the fact that using `{block|multiblock}<Block, 1>` behaves exactly as
+a classical Bloom filter.
+
+We don't know of any closed, simple formula for the FPR of block and multiblock filters when
+`Bucketsize` is not its "natural" size (`sizeof(Block)` for `block<Block, K'>`,
+`K'*sizeof(Block)` for `multiblock<Block,K'>`), that is, when subfilter values overlap,
+but empirical calculations show that FPR improves (reduces) with smaller values of `BucketSize`
+and larger values of $$k$$, $$k'$$ and $$c=n/m$$. Some examples:
+
+* `filter<T, Hash, 1, multiblock<unsigned char,9>, BucketSize>`:
+$$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.65$$
+* `filter<T, Hash, 1, multiblock<uint32_t,9>, BucketSize>`: 
+$$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.80$$
+* `filter<T, Hash, 1, multiblock<uint64_t,9>, BucketSize>`: 
+$$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.87$$
+
+(Remember that `BucketSize` = 0 selects the non-overlapping case.)
