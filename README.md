@@ -116,7 +116,7 @@ $$k_{\text{opt}}=c\ln2,$$
 
 yielding a minimum attainable FPR of $$0.5^{c \cdot \ln 2} \approx 1/1.6168^{c}$$.
 
-In the case of a Boost.Bloom blocked filter of the form `filter<T, Hash, K, block<Block, K'>>`, we can extend
+In the case of a Boost.Bloom block filter of the form `filter<T, Hash, K, block<Block, K'>>`, we can extend
 the approach from [Putze et al.](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f376ff09a64b388bfcde2f5353e9ddb44033aac8)
 to derive the (approximate but very precise) formula:
 
@@ -146,7 +146,7 @@ a classical Bloom filter.
 We don't know of any closed, simple formula for the FPR of block and multiblock filters when
 `Bucketsize` is not its "natural" size (`sizeof(Block)` for `block<Block, K'>`,
 `K'*sizeof(Block)` for `multiblock<Block,K'>`), that is, when subfilter values overlap,
-but empirical calculations show that FPR improves (reduces) with smaller values of `BucketSize`
+but empirical calculations show that $$FPR/FPR_\text{baseline}$$ improves (reduces) with smaller values of `BucketSize`
 and larger values of $$k$$, $$k'$$ and $$c=n/m$$. Some examples:
 
 * `filter<T, Hash, 1, multiblock<unsigned char,9>, BucketSize>`:
