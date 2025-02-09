@@ -47,8 +47,8 @@ that marks one or more of its bits according to some associated strategy.
 ```cpp
 template<
   typename T, typename Hash, std::size_t K,
-  typename Subfilter=block<unsigned char, 1>, std::size_t BucketSize=0,
-  typename Allocator=std::allocator<unsigned char>  
+  typename Subfilter = block<unsigned char, 1>, std::size_t BucketSize = 0,
+  typename Allocator = std::allocator<unsigned char>  
 >
 class filter;
 ```
@@ -79,9 +79,9 @@ which may result in more cache misses.
 
 Sets `K'` bits in an underlying value of the unsigned integral type `Block`
 (e.g. `unsigned char`, `uint32_t`, `uint64_t`). So,
-a `bloom::filter<T, Hash, K, block<Block, K'>>` will set `K*K'` bits per element.
+a `filter<T, Hash, K, block<Block, K'>>` will set `K*K'` bits per element.
 The tradeoff here is that insertion/lookup will be (much) faster than
-with `bloom::filter<T, Hash, K*K'>` while the FPR will be worse (larger).
+with `filter<T, Hash, K*K'>` while the FPR will be worse (larger).
 FPR is better the wider `Block` is.
 
 ### `multiblock<Block, K'>`
@@ -145,15 +145,15 @@ a classical Bloom filter.
 
 We don't know of any closed, simple formula for the FPR of block and multiblock filters when
 `Bucketsize` is not its "natural" size (`sizeof(Block)` for `block<Block, K'>`,
-`K'*sizeof(Block)` for `multiblock<Block,K'>`), that is, when subfilter values overlap,
+`K'*sizeof(Block)` for `multiblock<Block, K'>`), that is, when subfilter values overlap,
 but empirical calculations show that $$FPR/FPR_\text{baseline}$$ improves (reduces) with smaller values of `BucketSize`
 and larger values of $$k$$, $$k'$$ and $$c=n/m$$. Some examples:
 
-* `filter<T, Hash, 1, multiblock<unsigned char,9>, BucketSize>`:
+* `filter<T, Hash, 1, multiblock<unsigned char, 9>, BucketSize>`:
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.65$$
-* `filter<T, Hash, 1, multiblock<uint32_t,9>, BucketSize>`: 
+* `filter<T, Hash, 1, multiblock<uint32_t, 9>, BucketSize>`: 
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.80$$
-* `filter<T, Hash, 1, multiblock<uint64_t,9>, BucketSize>`: 
+* `filter<T, Hash, 1, multiblock<uint64_t, 9>, BucketSize>`: 
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.87$$
 
 (Remember that `BucketSize` = 0 selects the non-overlapping case.)
