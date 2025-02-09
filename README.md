@@ -112,7 +112,7 @@ number of bits set per insertion (see a [derivation](https://en.wikipedia.org/wi
 of this formula). For a given load $$c=n/m$$, the optimum $$k$$ is
 the integer closest to:
 
-$$k_{\text{opt}}=c\ln2,$$
+$$k_{\text{opt}}=c\cdot\ln2,$$
 
 yielding a minimum attainable FPR of $$0.5^{c \cdot \ln 2} \approx 1/1.6168^{c}$$.
 
