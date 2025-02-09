@@ -103,7 +103,6 @@ private:
     __m256i h=make(hash);
     __m256i y=_mm256_or_si256(mask[k-1],x);
     return _mm256_testc_si256(y,h);
-    return _mm256_testc_si256(x,h);
   }
 };
 
