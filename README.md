@@ -109,7 +109,7 @@ $$FPR(n,m,k)=\left(1 - \left(1 - \frac{1}{m}\right)^{kn}\right)^k \approx \left(
 
 where $$n$$ is the number of elements inserted in the filter, $$m$$ its capacity in bits and $$k$$ the
 number of bits set per insertion (see a [derivation](https://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives)
-of this formula). For a given load $$c=n/m$$, the optimum $$k$$ is
+of this formula). For a given inverse load factor $$c=m/n$$, the optimum $$k$$ is
 the integer closest to:
 
 $$k_{\text{opt}}=c\cdot\ln2,$$
@@ -147,7 +147,7 @@ We don't know of any closed, simple formula for the FPR of block and multiblock 
 `Bucketsize` is not its "natural" size (`sizeof(Block)` for `block<Block, K'>`,
 `K'*sizeof(Block)` for `multiblock<Block, K'>`), that is, when subfilter values overlap,
 but empirical calculations show that $$FPR/FPR_\text{baseline}$$ improves (reduces) with smaller values of `BucketSize`
-and larger values of $$k$$, $$k'$$ and $$c=n/m$$. Some examples:
+and larger values of $$k$$, $$k'$$ and $$c=m/n$$. Some examples:
 
 * `filter<T, Hash, 1, multiblock<unsigned char, 9>, BucketSize>`:
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.65$$
