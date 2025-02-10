@@ -191,8 +191,8 @@ so `c` is the number of bits used per element.
   <tr>
     <th colspan="2"></th>
     <th colspan="4"><code>filter&lt;K></code></th>
-    <th colspan="4"><code>filter&lt;1, block&lt;uint64_t, 1>></code></th>
-    <th colspan="4"><code>filter&lt;1, multiblock&lt;uint64_t, 1>></code></th>
+    <th colspan="4"><code>filter&lt;1, block&lt;uint64_t, K>></code></th>
+    <th colspan="4"><code>filter&lt;1, multiblock&lt;uint64_t, K>></code></th>
   </tr>
   <tr>
     <th>c</th>
