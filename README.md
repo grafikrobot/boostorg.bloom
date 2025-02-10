@@ -133,7 +133,7 @@ $$FPR_\text{multiblock}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,kk'b
 
 As we have commented before, in general 
 
-$$FPR_\text{block}(n,m,b,k,k'), FPR_\text{multiblock}(n,m,b,k,k') \geq FPR(n,m,kk'),$$
+$$FPR_\text{block}(n,m,b,k,k') \geq FPR_\text{multiblock}(n,m,b,k,k') \geq FPR(n,m,kk'),$$
 
 that is, block and multi-block filters have worse FPR than the classical filter for the same number of bits
 set per insertion, but they will be much faster. We have the particular case
