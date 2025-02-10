@@ -157,3 +157,121 @@ $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.80$$
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.87$$
 
 (Remember that `BucketSize` = 0 selects the non-overlapping case.)
+
+## Experimental results
+
+All benchmarks run on a Windows 10 machine with 8GB RAM and an Intel Core i5-8265U CPU @1.60GHz
+(base frequency) using Clang 13.0.1 for Visual Studio (clang-cl) in 64-bit (x64), release mode
+(see [benchmarking code](benchmark/comparison_table.cpp)).
+
+For reference, these are the insertion, successful lookup and unsuccessful lookup times
+in nanoseconds per element for a `boost::unordered_flat_set<int>` with `N` = 10 million elements.
+The container uses 63.75 bits per element.
+
+<table>
+  <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
+  <tr>
+    <th>insertion</th>
+    <th>successful</br>lookup</th>
+    <th>unsuccessful</br>lookup</th>
+  </tr>
+  <tr>
+    <td align="right">84.07</td>
+    <td align="right">28.03</td>
+    <td align="right">16.38</td>
+  </tr>
+</table>
+
+The table shows the FPR and execution times for three different configurations
+of `boost::bloom::filter<int, boost::hash<int>, ...>`. The number of inserted elements
+is again `N` = 10 million. Filters are constructed with a capacity `c*N` (bits),
+so `c` is the number of bits used per element.
+
+<table>
+  <tr>
+    <th colspan="2"></th>
+    <th colspan="4"><code>filter&lt;K></code></th>
+    <th colspan="4"><code>filter&lt;1, block&lt;uint64_t, 1>></code></th>
+    <th colspan="4"><code>filter&lt;1, multiblock&lt;uint64_t, 1>></code></th>
+  </tr>
+  <tr>
+    <th>c</th>
+    <th>K</th>
+    <th>FPR [%]</th>
+    <th>ins.</th>
+    <th>succ.</br>lookup</th>
+    <th>unsucc.</br>lookup</th>
+    <th>FPR [%]</th>
+    <th>ins.</th>
+    <th>succ.</br>lookup</th>
+    <th>unsucc.</br>lookup</th>
+    <th>FPR [%]</th>
+    <th>ins.</th>
+    <th>succ.</br>lookup</th>
+    <th>unsucc.</br>lookup</th>
+  </tr>
+  <tr>
+    <td align="center">8</td>
+    <td align="center">6</td>
+    <td align="right">2.1566</td>
+    <td align="right">79.37</td>
+    <td align="right">37.36</td>
+    <td align="right">31.38</td>
+    <td align="right">3.7559</td>
+    <td align="right">17.48</td>
+    <td align="right">6.30</td>
+    <td align="right">5.77</td>
+    <td align="right">2.4528</td>
+    <td align="right">32.86</td>
+    <td align="right">11.45</td>
+    <td align="right">11.39</td>
+  </tr>
+  <tr>
+    <td align="center">12</td>
+    <td align="center">9</td>
+    <td align="right">0.3146</td>
+    <td align="right">134.33</td>
+    <td align="right">68.35</td>
+    <td align="right">39.05</td>
+    <td align="right">1.4761</td>
+    <td align="right">23.17</td>
+    <td align="right">7.80</td>
+    <td align="right">7.54</td>
+    <td align="right">0.4282</td>
+    <td align="right">43.19</td>
+    <td align="right">13.93</td>
+    <td align="right">13.87</td>
+  </tr>
+  <tr>
+    <td align="center">16</td>
+    <td align="center">11</td>
+    <td align="right">0.0456</td>
+    <td align="right">176.10</td>
+    <td align="right">91.07</td>
+    <td align="right">39.87</td>
+    <td align="right">0.7002</td>
+    <td align="right">51.14</td>
+    <td align="right">8.04</td>
+    <td align="right">7.70</td>
+    <td align="right">0.0770</td>
+    <td align="right">83.90</td>
+    <td align="right">19.96</td>
+    <td align="right">19.74</td>
+  </tr>
+  <tr>
+    <td align="center">20</td>
+    <td align="center">14</td>
+    <td align="right">0.0066</td>
+    <td align="right">216.50</td>
+    <td align="right">129.07</td>
+    <td align="right">41.82</td>
+    <td align="right">0.4900</td>
+    <td align="right">85.86</td>
+    <td align="right">7.79</td>
+    <td align="right">7.79</td>
+    <td align="right">0.0153</td>
+    <td align="right">95.90</td>
+    <td align="right">20.93</td>
+    <td align="right">21.44</td>
+  </tr>
+</table>
