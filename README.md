@@ -88,8 +88,8 @@ FPR is better the wider `Block` is.
 
 Instead of setting `K'` bits in a `Block` value, this subfilter sets
 one bit on each of the elements of a `Block[K']` subarray. This improves FPR
-without noticeably impacting performance with respect to `block<Block, K'>`,
-although cacheline boundaries can be crossed when accessing the subarray.
+but impacts performance with respect to `block<Block, K'>`, among other
+things because cacheline boundaries can be crossed when accessing the subarray.
 
 ### `fast_multiblock32<K'>`
 
