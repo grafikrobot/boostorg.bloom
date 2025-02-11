@@ -148,13 +148,13 @@ test_results test(std::size_t c)
     double t=measure([&]{
       std::size_t res=0;
       for(const auto& x:data_in)res+=f.may_contain(x);
-      return 0;
+      return res;
     });
     successful_lookup_time=t/N*1E9;
     t=measure([&]{
       std::size_t res=0;
       for(const auto& x:data_out)res+=f.may_contain(x);
-      return 0;
+      return res;
     });
     unsuccessful_lookup_time=t/N*1E9;
   }
