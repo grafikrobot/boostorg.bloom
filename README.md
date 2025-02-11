@@ -176,9 +176,9 @@ The container uses 63.75 bits per element.
     <th>unsuccessful</br>lookup</th>
   </tr>
   <tr>
-    <td align="right">84.07</td>
-    <td align="right">28.03</td>
-    <td align="right">16.38</td>
+    <td align="right">80.59</td>
+    <td align="right">34.72</td>
+    <td align="right">18.71</td>
   </tr>
 </table>
 
@@ -186,6 +186,7 @@ The table shows the FPR and execution times for three different configurations
 of `boost::bloom::filter<int, boost::hash<int>, ...>`. The number of inserted elements
 is again `N` = 10 million. Filters are constructed with a capacity `c*N` (bits),
 so `c` is the number of bits used per element.
+
 
 <table>
   <tr>
@@ -214,64 +215,64 @@ so `c` is the number of bits used per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1566</td>
-    <td align="right">79.37</td>
-    <td align="right">37.36</td>
-    <td align="right">31.38</td>
+    <td align="right">57.80</td>
+    <td align="right">40.58</td>
+    <td align="right">29.89</td>
     <td align="right">3.7559</td>
-    <td align="right">17.48</td>
-    <td align="right">6.30</td>
-    <td align="right">5.77</td>
+    <td align="right">15.43</td>
+    <td align="right">15.11</td>
+    <td align="right">14.88</td>
     <td align="right">2.4528</td>
-    <td align="right">32.86</td>
-    <td align="right">11.45</td>
-    <td align="right">11.39</td>
+    <td align="right">27.75</td>
+    <td align="right">22.78</td>
+    <td align="right">22.99</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3146</td>
-    <td align="right">134.33</td>
-    <td align="right">68.35</td>
-    <td align="right">39.05</td>
+    <td align="right">121.87</td>
+    <td align="right">71.12</td>
+    <td align="right">38.76</td>
     <td align="right">1.4761</td>
-    <td align="right">23.17</td>
-    <td align="right">7.80</td>
-    <td align="right">7.54</td>
+    <td align="right">21.43</td>
+    <td align="right">19.21</td>
+    <td align="right">19.27</td>
     <td align="right">0.4282</td>
-    <td align="right">43.19</td>
-    <td align="right">13.93</td>
-    <td align="right">13.87</td>
+    <td align="right">38.95</td>
+    <td align="right">38.82</td>
+    <td align="right">38.58</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0456</td>
-    <td align="right">176.10</td>
-    <td align="right">91.07</td>
-    <td align="right">39.87</td>
+    <td align="right">161.33</td>
+    <td align="right">97.14</td>
+    <td align="right">39.01</td>
     <td align="right">0.7002</td>
-    <td align="right">51.14</td>
-    <td align="right">8.04</td>
-    <td align="right">7.70</td>
+    <td align="right">47.73</td>
+    <td align="right">42.82</td>
+    <td align="right">41.77</td>
     <td align="right">0.0770</td>
-    <td align="right">83.90</td>
-    <td align="right">19.96</td>
-    <td align="right">19.74</td>
+    <td align="right">86.47</td>
+    <td align="right">79.70</td>
+    <td align="right">79.52</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0066</td>
-    <td align="right">216.50</td>
-    <td align="right">129.07</td>
-    <td align="right">41.82</td>
+    <td align="right">219.21</td>
+    <td align="right">129.31</td>
+    <td align="right">42.64</td>
     <td align="right">0.4900</td>
-    <td align="right">85.86</td>
-    <td align="right">7.79</td>
-    <td align="right">7.79</td>
+    <td align="right">87.07</td>
+    <td align="right">45.49</td>
+    <td align="right">45.22</td>
     <td align="right">0.0153</td>
-    <td align="right">95.90</td>
-    <td align="right">20.93</td>
-    <td align="right">21.44</td>
+    <td align="right">98.89</td>
+    <td align="right">86.18</td>
+    <td align="right">87.33</td>
   </tr>
 </table>
