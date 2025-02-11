@@ -80,6 +80,8 @@ filter:
 
 public:
   using value_type=T;
+  using super::k;
+  using subfilter=typename super::subfilter;
   using allocator_type=typename super::allocator_type;
   using size_type=typename super::size_type;
   using difference_type=typename super::difference_type;

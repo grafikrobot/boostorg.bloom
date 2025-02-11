@@ -126,14 +126,16 @@ template<
 >
 class filter_core:empty_value<Allocator,0>
 {
-public: //TODO: revert to private
   static_assert(K>0,"K must be >= 1");
   static_assert(
     std::is_same<allocator_value_type_t<Allocator>,unsigned char>::value,
     "Allocator value_type must be unsigned char");
 
+public:
   static constexpr std::size_t k=K;
   using subfilter=Subfilter;
+
+private:
   using block_type=typename subfilter::value_type;
   static constexpr std::size_t used_block_size=
     detail::used_block_size<subfilter>::value;

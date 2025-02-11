@@ -54,6 +54,7 @@ void resume_timing()
 }
 
 #include <boost/bloom/block.hpp>
+#include <boost/bloom/fast_multiblock32.hpp>
 #include <boost/bloom/filter.hpp>
 #include <boost/bloom/multiblock.hpp>
 #include <boost/core/detail/splitmix64.hpp>
@@ -179,34 +180,19 @@ struct print_double
   int    precision;
 };
 
-template<std::size_t K> void row(std::size_t c)
+template<typename Filters> void row(std::size_t c)
 {
-  using namespace boost::bloom;
-  using filters=boost::mp11::mp_list<
-    boost::bloom::filter<
-      int,boost::hash<int>,K
-    >,
-    boost::bloom::filter<
-      int,boost::hash<int>,1,
-      block<boost::uint64_t,K>
-    >,
-    boost::bloom::filter<
-      int,boost::hash<int>,1,
-      multiblock<boost::uint64_t,K>
-    >
-  >;
-
   std::cout<<
     "  <tr>\n"
-    "    <td align=\"center\">"<<c<<"</td>\n"
-    "    <td align=\"center\">"<<K<<"</td>\n";
+    "    <td align=\"center\">"<<c<<"</td>\n";
 
   boost::mp11::mp_for_each<
-    boost::mp11::mp_transform<boost::mp11::mp_identity,filters>
+    boost::mp11::mp_transform<boost::mp11::mp_identity,Filters>
   >([&](auto i){
     using filter=typename decltype(i)::type;
     auto res=test<filter>(c);
     std::cout<<
+      "    <td align=\"center\">"<<filter::k*filter::subfilter::k<<"</td>\n"
       "    <td align=\"right\">"<<print_double(res.fpr,4)<<"</td>\n"
       "    <td align=\"right\">"<<print_double(res.insertion_time)<<"</td>\n"
       "    <td align=\"right\">"<<print_double(res.successful_lookup_time)<<"</td>\n"
@@ -216,6 +202,22 @@ template<std::size_t K> void row(std::size_t c)
   std::cout<<
     "  </tr>\n";
 }
+
+using namespace boost::bloom;
+
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters1=boost::mp11::mp_list<
+  filter<int,boost::hash<int>,K1>,
+  filter<int,boost::hash<int>,1,block<boost::uint64_t,K2>>,
+  filter<int,boost::hash<int>,1,multiblock<boost::uint64_t,K3>>
+>;
+
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters2=boost::mp11::mp_list<
+  filter<int,boost::hash<int>,1,fast_multiblock32<K1>>,
+  filter<int,boost::hash<int>,1,block<boost::uint64_t,K2>,1>,
+  filter<int,boost::hash<int>,1,multiblock<boost::uint64_t,K3>,1>
+>;
 
 int main()
 {
@@ -227,8 +229,8 @@ int main()
     "  <tr><th colspan=\"3\"><code>boost::unordered_flat_set</code></tr>\n"
     "  <tr>\n"
     "    <th>insertion</th>\n"
-    "    <th>successful</br>lookup</th>\n"
-    "    <th>unsuccessful</br>lookup</th>\n"
+    "    <th>successful<br/>lookup</th>\n"
+    "    <th>unsuccessful<br/>lookup</th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <td align=\"right\">"<<print_double(res.insertion_time)<<"</td>\n"
@@ -240,32 +242,50 @@ int main()
   /* filter table */
 
   auto subheader=
-    "    <th>FPR [%]</th>\n"
+    "    <th>K</th>\n"
+    "    <th>FPR<br/>[%]</th>\n"
     "    <th>ins.</th>\n"
-    "    <th>succ.</br>lookup</th>\n"
-    "    <th>unsucc.</br>lookup</th>\n";
+    "    <th>succ.<br/>lkp.</th>\n"
+    "    <th>uns.<br/>lkp.</th>\n";
 
   std::cout<<
     "<table>\n"
     "  <tr>\n"
-    "    <th colspan=\"2\"></th>\n"
-    "    <th colspan=\"4\"><code>filter&lt;K></code></th>\n"
-    "    <th colspan=\"4\"><code>filter&lt;1, block&lt;uint64_t, K>></code></th>\n"
-    "    <th colspan=\"4\"><code>filter&lt;1, multiblock&lt;uint64_t, K>></code></th>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1, block&lt;uint64_t, K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1, multiblock&lt;uint64_t, K>></code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
-    "    <th>c</th>\n"
-    "    <th>K</th>\n";
-  std::cout<<
+    "    <th>c</th>\n"<<
     subheader<<
     subheader<<
     subheader<<
     "  </tr>\n";
 
-  row<6>(8);
-  row<9>(12);
-  row<11>(16);
-  row<14>(20);
+  row<filters1< 6, 4,  5>>( 8);
+  row<filters1< 9, 5,  8>>(12);
+  row<filters1<11, 6, 11>>(16);
+  row<filters1<14, 7, 14>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;K, fast_multiblock32&ltK>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1, block&lt;uint64_t, K>, 1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1, multiblock&lt;uint64_t, K>, 1></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters2<5, 5,  5>>( 8);
+  row<filters2<8, 6,  8>>(12);
+  row<filters2<8, 7, 11>>(16);
+  row<filters2<8, 8, 14>>(20);
 
   std::cout<<"</table>\n";
 }
