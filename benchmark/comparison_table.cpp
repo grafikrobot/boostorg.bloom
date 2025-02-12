@@ -253,8 +253,8 @@ int main()
     "  <tr>\n"
     "    <th></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1, block&lt;uint64_t, K>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1, multiblock&lt;uint64_t, K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
@@ -271,9 +271,9 @@ int main()
   std::cout<<
     "  <tr>\n"
     "    <th></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;K, fast_multiblock32&ltK>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1, block&lt;uint64_t, K>, 1></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1, multiblock&lt;uint64_t, K>, 1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;K,fast_multiblock32&ltK>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t, K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
