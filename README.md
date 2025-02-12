@@ -120,7 +120,7 @@ In the case of a Boost.Bloom block filter of the form `filter<T, Hash, K, block<
 the approach from [Putze et al.](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f376ff09a64b388bfcde2f5353e9ddb44033aac8)
 to derive the (approximate but very precise) formula:
 
-$$FPR_{\text{block}}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,kbn/m) \cdot FPR(i,b,k')\right)^{k},$$
+$$FPR_{\text{block}}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,nbk/m) \cdot FPR(i,b,k')\right)^{k},$$
 
 where
 
@@ -129,7 +129,7 @@ $$\text{Pois}(i,\lambda)=\frac{\lambda^i e^{-\lambda}}{i!}$$
 is the probability mass function of a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution)
 with mean $$\lambda$$, and $$b$$ is the size of `Block` in bits. If we're using `multiblock<Block,K'>`, we have
 
-$$FPR_\text{multiblock}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,kk'bn/m) \cdot FPR(i,b,1)^{k'}\right)^{k}.$$
+$$FPR_\text{multiblock}(n,m,b,k,k')=\left(\sum_{i=0}^{\infty} \text{Pois}(i,nbkk'/m) \cdot FPR(i,b,1)^{k'}\right)^{k}.$$
 
 As we have commented before, in general 
 
