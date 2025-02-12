@@ -16,6 +16,7 @@
 #include <boost/config.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <boost/core/empty_value.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/unordered/hash_traits.hpp> // TODO: internalize?
 
 namespace boost{
@@ -26,26 +27,27 @@ namespace detail{
  * mulx_mix_policy uses the mulx_mix function from
  * <boost/bloom/detail/mulx.hpp>.
  *
- * filter mixes hash results with mulx_mix unless the hash is marked
- * as avalanching, i.e. of good quality
- * (see <boost/unordered/hash_traits.hpp>).
+ * filter mixes hash results with mulx64_mix if the hash is not marked as
+ * avalanching, i.e. it's not of good quality (see
+ * <boost/unordered/hash_traits.hpp>), or if std::size_t is less than 64 bits
+ * (mixing policies promote to boost::uint64_t).
  */
 
 struct no_mix_policy
 {
   template<typename Hash,typename T>
-  static inline std::size_t mix(const Hash& h,const T& x)
+  static inline boost::uint64_t mix(const Hash& h,const T& x)
   {
-    return h(x);
+    return (boost::uint64_t)h(x);
   }
 };
 
-struct mulx_mix_policy
+struct mulx64_mix_policy
 {
   template<typename Hash,typename T>
-  static inline std::size_t mix(const Hash& h,const T& x)
+  static inline boost::uint64_t mix(const Hash& h,const T& x)
   {
-    return mulx_mix(h(x));
+    return mulx64_mix((boost::uint64_t)h(x));
   }
 };
 
@@ -73,9 +75,10 @@ filter:
 {
   using super=detail::filter_core<K,Subfilter,BucketSize,Allocator>;
   using mix_policy=typename std::conditional<
-    unordered::hash_is_avalanching<Hash>::value,
+    unordered::hash_is_avalanching<Hash>::value&&
+    sizeof(std::size_t)>=sizeof(boost::uint64_t),
     detail::no_mix_policy,
-    detail::mulx_mix_policy
+    detail::mulx64_mix_policy
   >::type;
 
 public:
@@ -109,7 +112,7 @@ private:
 
   const Hash& h()const{return hash_base::get();}
 
-  inline std::size_t hash_for(const T& x)const
+  inline boost::uint64_t hash_for(const T& x)const
   {
     return mix_policy::mix(h(),x);
   }

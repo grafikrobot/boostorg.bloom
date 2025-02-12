@@ -11,12 +11,13 @@
 #ifndef BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
 #define BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
 
-#include <boost/bloom/detail/mulx.hpp>
+#include <boost/bloom/detail/mulx64.hpp>
 #include <boost/bloom/detail/sse2.hpp>
 #include <boost/config.hpp>
 #include <boost/core/bit.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/core/allocator_traits.hpp>
+#include <boost/cstdint.hpp>
 #include <cstring>
 #include <memory>
 #include <type_traits>
@@ -75,21 +76,21 @@ struct mcg_and_fastrange
     }
     {}
 
-  inline std::size_t range()const noexcept{return rng;}
+  inline std::size_t range()const noexcept{return (std::size_t)rng;}
 
-  inline void prepare_hash(std::size_t& hash)const noexcept
+  inline void prepare_hash(boost::uint64_t& hash)const noexcept
   {
     hash|=1u;
   }
 
-  inline std::size_t next_position(std::size_t& hash)const noexcept
+  inline std::size_t next_position(boost::uint64_t& hash)const noexcept
   {
-    std::size_t hi;
-    hash=mulx(hash,rng,hi);
-    return hi;
+    boost::uint64_t hi;
+    hash=mulx64(hash,rng,hi);
+    return (std::size_t)hi;
   }
 
-  std::size_t rng;
+  boost::uint64_t rng;
 };
 
 /* used_block_size<Subfilter>::value is Subfilter::used_value_size if it
@@ -181,16 +182,16 @@ protected:
     return hs.range()*CHAR_BIT;
   }
 
-  BOOST_FORCEINLINE void insert(std::size_t hash)
+  BOOST_FORCEINLINE void insert(boost::uint64_t hash)
   {
     hs.prepare_hash(hash);
     for(auto n=k;n--;){
-      auto p=next_element(hash); /* modifies hash */
+      auto p=next_element(hash); /* modifies h */
       set(p,hash);
     }
   }
 
-  BOOST_FORCEINLINE bool may_contain(std::size_t hash)const
+  BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
   {
     hs.prepare_hash(hash);
 #if 1
@@ -229,20 +230,20 @@ private:
        boost::uintptr_t(p))%initial_alignment;
   }
 
-  BOOST_FORCEINLINE bool get(const unsigned char* p,std::size_t hash)const
+  BOOST_FORCEINLINE bool get(const unsigned char* p,boost::uint64_t hash)const
   {
     return get(p,hash,std::integral_constant<bool,are_blocks_aligned>{});
   }
 
   BOOST_FORCEINLINE bool get(
-    const unsigned char* p,std::size_t hash,
+    const unsigned char* p,boost::uint64_t hash,
     std::true_type /* blocks aligned */)const
   {
     return subfilter::check(*reinterpret_cast<const block_type*>(p),hash);
   }
 
   BOOST_FORCEINLINE bool get(
-    const unsigned char* p,std::size_t hash,
+    const unsigned char* p,boost::uint64_t hash,
     std::false_type /* blocks not aligned */)const
   {
     block_type x;
@@ -250,20 +251,20 @@ private:
     return subfilter::check(x,hash);
   }
 
-  BOOST_FORCEINLINE void set(unsigned char* p,std::size_t hash)
+  BOOST_FORCEINLINE void set(unsigned char* p,boost::uint64_t hash)
   {
     return set(p,hash,std::integral_constant<bool,are_blocks_aligned>{});
   }
 
   BOOST_FORCEINLINE void set(
-    unsigned char* p,std::size_t hash,
+    unsigned char* p,boost::uint64_t hash,
     std::true_type /* blocks aligned */)const
   {
     subfilter::mark(*reinterpret_cast<block_type*>(p),hash);
   }
 
   BOOST_FORCEINLINE void set(
-    unsigned char* p,std::size_t hash,
+    unsigned char* p,boost::uint64_t hash,
     std::false_type /* blocks not aligned */)const
   {
     block_type x;
@@ -272,18 +273,18 @@ private:
     std::memcpy(p,&x,used_block_size);
   }
 
-  BOOST_FORCEINLINE unsigned char* next_element(std::size_t& hash)
+  BOOST_FORCEINLINE unsigned char* next_element(boost::uint64_t& h)
   {
-    auto p=buckets+hs.next_position(hash)*bucket_size;
+    auto p=buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH_WRITE((unsigned char*)p+i*cacheline);
     }
     return p;
   }
 
-  BOOST_FORCEINLINE const unsigned char* next_element(std::size_t& hash)const
+  BOOST_FORCEINLINE const unsigned char* next_element(boost::uint64_t& h)const
   {
-    auto p=buckets+hs.next_position(hash)*bucket_size;
+    auto p=buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH((unsigned char*)p+i*cacheline);
     }

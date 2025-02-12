@@ -7,10 +7,9 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_DETAIL_MULX_HPP
-#define BOOST_BLOOM_DETAIL_MULX_HPP
+#ifndef BOOST_BLOOM_DETAIL_MULX64_HPP
+#define BOOST_BLOOM_DETAIL_MULX64_HPP
 
-#include <boost/bloom/detail/64bit_arch.hpp>
 #include <boost/cstdint.hpp>
 #include <climits>
 #include <cstddef>
@@ -84,43 +83,12 @@ inline boost::uint64_t mulx64(
 
 #endif
 
-inline boost::uint32_t mulx32(
-  boost::uint32_t x,boost::uint32_t y,boost::uint32_t& hi)
+inline boost::uint64_t mulx64_mix(boost::uint64_t x)noexcept
 {
-  boost::uint64_t r=(boost::uint64_t)x*y;
-  hi=(boost::uint32_t)(r>>32);
-#if defined(__MSVC_RUNTIME_CHECKS)
-  return (boost::uint32_t)(r&UINT32_MAX);
-#else
-  return (boost::uint32_t)r;
-#endif
-}
-
-inline std::size_t mulx(std::size_t x,std::size_t y,std::size_t& hi)noexcept
-{
-#if defined(BOOST_BLOOM_64B_ARCHITECTURE)
-  boost::uint64_t hi_;
-  boost::uint64_t r=mulx64((boost::uint64_t)x,(boost::uint64_t)y,hi_);
-  hi=(std::size_t)hi_;
-  return (std::size_t)r;
-#else /* 32 bits assumed */
-  return mulx32(x,y,hi);
-#endif
-}
-
-inline std::size_t mulx_mix(std::size_t x)noexcept
-{
-#if defined(BOOST_BLOOM_64B_ARCHITECTURE)
   /* multiplier is phi */
   boost::uint64_t hi;
-  boost::uint64_t lo=mulx64((boost::uint64_t)x,0x9E3779B97F4A7C15ull,hi);
-  return (std::size_t)(hi^lo);
-#else /* 32 bits assumed */
-  /* multiplier from https://arxiv.org/abs/2001.05304 */
-  boost::uint32_t hi;
-  boost::uint32_t lo=mulx32(x,0xE817FB2Du,hi);
-  return (std::size_t)(hi^lo);
-#endif
+  boost::uint64_t lo=mulx64(x,0x9E3779B97F4A7C15ull,hi);
+  return hi^lo;
 }
 
 } /* namespace detail */

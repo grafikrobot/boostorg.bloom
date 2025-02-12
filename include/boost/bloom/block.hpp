@@ -10,6 +10,7 @@
 #define BOOST_BLOOM_BLOCK_HPP
 
 #include <boost/bloom/detail/block_base.hpp>
+#include <boost/cstdint.hpp>
 #include <cstddef>
 
 namespace boost{
@@ -21,7 +22,7 @@ struct block:private detail::block_base<Block,K>
   static constexpr std::size_t k=K;
   using value_type=Block;
 
-  static inline void mark(value_type& x,std::size_t hash)
+  static inline void mark(value_type& x,boost::uint64_t hash)
   {
     auto h=hash;
     for(std::size_t i=0;i<k;++i){
@@ -30,7 +31,7 @@ struct block:private detail::block_base<Block,K>
     }
   }
 
-  static inline bool check(const value_type& x,std::size_t hash)
+  static inline bool check(const value_type& x,boost::uint64_t hash)
   {
     Block fp=0;
     mark(fp,hash);

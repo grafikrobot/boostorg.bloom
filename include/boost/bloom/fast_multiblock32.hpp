@@ -12,7 +12,6 @@
 #include <boost/bloom/detail/avx2.hpp>
 
 #if defined(BOOST_BLOOM_AVX2)
-#include <boost/bloom/detail/64bit_arch.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
@@ -36,19 +35,19 @@ struct fast_multiblock32
   using value_type=__m256i;
   static constexpr std::size_t used_value_size=sizeof(boost::uint32_t)*k;
 
-  static BOOST_FORCEINLINE void mark(value_type& x,std::size_t hash)
+  static BOOST_FORCEINLINE void mark(value_type& x,boost::uint64_t hash)
   {
     __m256i h=make(hash);
     x=_mm256_or_si256(x,h);
   }
 
-  static BOOST_FORCEINLINE bool check(const value_type& x,std::size_t hash)
+  static BOOST_FORCEINLINE bool check(const value_type& x,boost::uint64_t hash)
   {
     return check(x,hash,std::integral_constant<bool,k==8>{});
   }
 
 private:
-  static BOOST_FORCEINLINE value_type make(std::size_t hash)
+  static BOOST_FORCEINLINE value_type make(boost::uint64_t hash)
   {
     const __m256i ones[8]={
       _mm256_set_epi32(0,0,0,0,0,0,0,1),
@@ -69,26 +68,21 @@ private:
       0x47b6137b44974d91ull,0x8824ad5ba2b7289dull,
       0x705495c72df1424bull,0x9efc49475c6bfb31ull);
     
-#if defined(BOOST_BLOOM_64B_ARCHITECTURE)
     __m256i h=_mm256_set1_epi64x(hash);
-#else /* 32 bits assumed */
-    __m256i h=_mm256_set1_epi32(hash);
-#endif
-
     h=_mm256_mullo_epi32(rehash,h);
     h=_mm256_srli_epi32(h,32-5);
     return _mm256_sllv_epi32(ones[k-1],h);
   }
 
   static BOOST_FORCEINLINE bool check(
-    const value_type& x,std::size_t hash,std::true_type /* k==8 */)
+    const value_type& x,boost::uint64_t hash,std::true_type /* k==8 */)
   {
     __m256i h=make(hash);
     return _mm256_testc_si256(x,h);
   }
 
   static BOOST_FORCEINLINE bool check(
-    const value_type& x,std::size_t hash,std::false_type /* k!=8 */)
+    const value_type& x,boost::uint64_t hash,std::false_type /* k!=8 */)
   {
     const __m256i mask[7]={
       _mm256_set_epi32(-1,-1,-1,-1,-1,-1,-1, 0),
