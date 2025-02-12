@@ -165,7 +165,7 @@ All benchmarks run on a Windows 10 machine with 8GB RAM and an Intel Core i5-826
 release mode (see [benchmarking code](benchmark/comparison_table.cpp)).
 
 The tables show the FPR and execution times in nanoseconds per operation 
-for three different configurationsof `boost::bloom::filter<int, boost::hash<int>, ...>`.
+for three different configurations of `boost::bloom::filter<int, boost::hash<int>, ...>`.
 The number of inserted elements is `N` = 10 million. Filters are constructed with a capacity
 `c*N` (bits), so `c` is the number of bits used per element. For each combination of `c` and
 a given filter configuration, the optimum value of `K` (that yielding the minimum FPR)
