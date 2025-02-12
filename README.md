@@ -161,7 +161,7 @@ $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.87$$
 ## Experimental results
 
 All benchmarks run on a Windows 10 machine with 8GB RAM and an Intel Core i5-8265U CPU @1.60GHz
-(base frequency) using Clang 13.0.1 for Visual Studio (clang-cl) in 64-bit (x64), `/arch:AVX2`,
+(base frequency) using Clang 13.0.1 for Visual Studio (clang-cl), `/arch:AVX2`,
 release mode (see [benchmarking code](benchmark/comparison_table.cpp)).
 
 The tables show the FPR and execution times in nanoseconds per operatoin 
