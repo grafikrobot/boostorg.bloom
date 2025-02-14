@@ -185,9 +185,9 @@ This container uses 63.75 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">77.33</td>
-    <td align="right">32.39</td>
-    <td align="right">16.35</td>
+    <td align="right">81.78</td>
+    <td align="right">32.78</td>
+    <td align="right">16.29</td>
   </tr>
 </table>
 <table>
@@ -219,73 +219,73 @@ This container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1566</td>
-    <td align="right">58.76</td>
-    <td align="right">41.33</td>
-    <td align="right">30.14</td>
+    <td align="right">62.91</td>
+    <td align="right">43.83</td>
+    <td align="right">29.88</td>
     <td align="center">4</td>
     <td align="right">3.3462</td>
-    <td align="right">13.90</td>
-    <td align="right">10.84</td>
-    <td align="right">10.74</td>
+    <td align="right">13.49</td>
+    <td align="right">10.45</td>
+    <td align="right">10.29</td>
     <td align="center">5</td>
     <td align="right">2.4515</td>
-    <td align="right">16.06</td>
-    <td align="right">13.56</td>
-    <td align="right">13.80</td>
+    <td align="right">15.47</td>
+    <td align="right">13.92</td>
+    <td align="right">13.90</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3146</td>
-    <td align="right">116.73</td>
-    <td align="right">69.22</td>
-    <td align="right">37.05</td>
+    <td align="right">114.18</td>
+    <td align="right">68.75</td>
+    <td align="right">36.60</td>
     <td align="center">5</td>
     <td align="right">1.0310</td>
-    <td align="right">17.76</td>
-    <td align="right">12.88</td>
-    <td align="right">12.92</td>
+    <td align="right">17.89</td>
+    <td align="right">12.70</td>
+    <td align="right">12.45</td>
     <td align="center">8</td>
     <td align="right">0.4244</td>
-    <td align="right">17.02</td>
-    <td align="right">14.74</td>
-    <td align="right">14.83</td>
+    <td align="right">16.65</td>
+    <td align="right">14.19</td>
+    <td align="right">14.51</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0456</td>
-    <td align="right">158.71</td>
-    <td align="right">93.87</td>
-    <td align="right">37.94</td>
+    <td align="right">157.34</td>
+    <td align="right">93.70</td>
+    <td align="right">38.43</td>
     <td align="center">6</td>
     <td align="right">0.4035</td>
-    <td align="right">19.52</td>
-    <td align="right">14.76</td>
-    <td align="right">14.64</td>
+    <td align="right">19.64</td>
+    <td align="right">15.18</td>
+    <td align="right">14.61</td>
     <td align="center">11</td>
-    <td align="right">0.0770</td>
-    <td align="right">73.00</td>
-    <td align="right">72.73</td>
-    <td align="right">73.08</td>
+    <td align="right">0.0776</td>
+    <td align="right">33.42</td>
+    <td align="right">24.63</td>
+    <td align="right">24.53</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0066</td>
-    <td align="right">219.41</td>
-    <td align="right">130.09</td>
-    <td align="right">42.98</td>
+    <td align="right">212.80</td>
+    <td align="right">127.66</td>
+    <td align="right">40.25</td>
     <td align="center">7</td>
     <td align="right">0.1879</td>
-    <td align="right">21.42</td>
-    <td align="right">15.53</td>
-    <td align="right">15.33</td>
+    <td align="right">20.96</td>
+    <td align="right">15.02</td>
+    <td align="right">15.04</td>
     <td align="center">14</td>
     <td align="right">0.0153</td>
-    <td align="right">90.57</td>
-    <td align="right">85.89</td>
-    <td align="right">84.98</td>
+    <td align="right">37.16</td>
+    <td align="right">30.01</td>
+    <td align="right">29.95</td>
   </tr>
   <tr>
     <th></th>
@@ -315,73 +315,73 @@ This container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7367</td>
-    <td align="right">16.51</td>
-    <td align="right">12.76</td>
-    <td align="right">12.81</td>
+    <td align="right">15.58</td>
+    <td align="right">12.13</td>
+    <td align="right">12.25</td>
     <td align="center">5</td>
     <td align="right">3.0580</td>
-    <td align="right">15.90</td>
-    <td align="right">12.15</td>
-    <td align="right">12.18</td>
+    <td align="right">14.82</td>
+    <td align="right">11.47</td>
+    <td align="right">11.44</td>
     <td align="center">5</td>
     <td align="right">2.3256</td>
-    <td align="right">24.44</td>
-    <td align="right">21.23</td>
-    <td align="right">18.78</td>
+    <td align="right">15.58</td>
+    <td align="right">12.98</td>
+    <td align="right">12.94</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5399</td>
-    <td align="right">15.63</td>
-    <td align="right">11.16</td>
-    <td align="right">11.16</td>
+    <td align="right">14.68</td>
+    <td align="right">10.84</td>
+    <td align="right">11.78</td>
     <td align="center">6</td>
     <td align="right">0.8253</td>
-    <td align="right">20.17</td>
-    <td align="right">14.80</td>
-    <td align="right">14.83</td>
+    <td align="right">19.41</td>
+    <td align="right">14.57</td>
+    <td align="right">14.67</td>
     <td align="center">8</td>
     <td align="right">0.3777</td>
-    <td align="right">23.82</td>
-    <td align="right">16.42</td>
-    <td align="right">16.05</td>
+    <td align="right">22.60</td>
+    <td align="right">16.45</td>
+    <td align="right">15.94</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">8</td>
     <td align="right">0.1314</td>
-    <td align="right">18.68</td>
-    <td align="right">14.93</td>
-    <td align="right">13.03</td>
+    <td align="right">17.81</td>
+    <td align="right">12.00</td>
+    <td align="right">11.98</td>
     <td align="center">7</td>
     <td align="right">0.2891</td>
-    <td align="right">22.06</td>
-    <td align="right">17.72</td>
-    <td align="right">18.88</td>
+    <td align="right">23.33</td>
+    <td align="right">16.53</td>
+    <td align="right">16.41</td>
     <td align="center">11</td>
-    <td align="right">0.0654</td>
-    <td align="right">82.62</td>
-    <td align="right">53.33</td>
-    <td align="right">54.98</td>
+    <td align="right">0.0643</td>
+    <td align="right">34.14</td>
+    <td align="right">24.44</td>
+    <td align="right">24.43</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">8</td>
     <td align="right">0.0421</td>
-    <td align="right">17.61</td>
-    <td align="right">12.53</td>
-    <td align="right">12.33</td>
+    <td align="right">17.22</td>
+    <td align="right">12.06</td>
+    <td align="right">12.07</td>
     <td align="center">8</td>
     <td align="right">0.1213</td>
-    <td align="right">24.81</td>
-    <td align="right">16.92</td>
-    <td align="right">16.61</td>
+    <td align="right">23.56</td>
+    <td align="right">16.17</td>
+    <td align="right">16.05</td>
     <td align="center">14</td>
-    <td align="right">0.0111</td>
-    <td align="right">99.80</td>
-    <td align="right">105.00</td>
-    <td align="right">102.28</td>
+    <td align="right">0.0119</td>
+    <td align="right">38.18</td>
+    <td align="right">30.82</td>
+    <td align="right">31.75</td>
   </tr>
 </table>
 
@@ -395,9 +395,9 @@ This container uses 63.75 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">80.88</td>
-    <td align="right">37.37</td>
-    <td align="right">17.30</td>
+    <td align="right">87.61</td>
+    <td align="right">38.44</td>
+    <td align="right">17.42</td>
   </tr>
 </table>
 <table>
@@ -429,73 +429,73 @@ This container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1489</td>
-    <td align="right">84.06</td>
-    <td align="right">79.17</td>
-    <td align="right">49.15</td>
+    <td align="right">80.30</td>
+    <td align="right">77.15</td>
+    <td align="right">49.44</td>
     <td align="center">4</td>
     <td align="right">3.3441</td>
-    <td align="right">33.71</td>
-    <td align="right">21.54</td>
-    <td align="right">19.36</td>
+    <td align="right">31.90</td>
+    <td align="right">19.27</td>
+    <td align="right">19.25</td>
     <td align="center">5</td>
     <td align="right">2.4525</td>
-    <td align="right">24.53</td>
-    <td align="right">23.13</td>
-    <td align="right">23.23</td>
+    <td align="right">23.87</td>
+    <td align="right">22.40</td>
+    <td align="right">22.37</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3184</td>
-    <td align="right">143.85</td>
-    <td align="right">137.71</td>
-    <td align="right">60.72</td>
+    <td align="right">141.30</td>
+    <td align="right">134.50</td>
+    <td align="right">59.77</td>
     <td align="center">5</td>
     <td align="right">1.0317</td>
-    <td align="right">39.65</td>
-    <td align="right">27.56</td>
-    <td align="right">27.53</td>
+    <td align="right">38.74</td>
+    <td align="right">27.25</td>
+    <td align="right">27.16</td>
     <td align="center">8</td>
     <td align="right">0.4209</td>
-    <td align="right">23.87</td>
-    <td align="right">28.90</td>
-    <td align="right">28.85</td>
+    <td align="right">23.50</td>
+    <td align="right">28.41</td>
+    <td align="right">28.25</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0455</td>
-    <td align="right">190.37</td>
-    <td align="right">180.08</td>
-    <td align="right">61.06</td>
+    <td align="right">191.88</td>
+    <td align="right">176.28</td>
+    <td align="right">59.54</td>
     <td align="center">6</td>
     <td align="right">0.4015</td>
-    <td align="right">44.68</td>
-    <td align="right">29.88</td>
-    <td align="right">30.37</td>
+    <td align="right">43.23</td>
+    <td align="right">29.18</td>
+    <td align="right">29.29</td>
     <td align="center">11</td>
-    <td align="right">0.0791</td>
-    <td align="right">101.91</td>
-    <td align="right">103.43</td>
-    <td align="right">104.66</td>
+    <td align="right">0.0783</td>
+    <td align="right">53.02</td>
+    <td align="right">49.14</td>
+    <td align="right">49.17</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0068</td>
-    <td align="right">255.34</td>
-    <td align="right">235.96</td>
-    <td align="right">64.76</td>
+    <td align="right">258.90</td>
+    <td align="right">234.95</td>
+    <td align="right">66.02</td>
     <td align="center">7</td>
     <td align="right">0.1883</td>
-    <td align="right">46.91</td>
-    <td align="right">33.91</td>
-    <td align="right">34.00</td>
+    <td align="right">60.00</td>
+    <td align="right">34.54</td>
+    <td align="right">34.65</td>
     <td align="center">14</td>
-    <td align="right">0.0154</td>
-    <td align="right">114.08</td>
-    <td align="right">113.70</td>
-    <td align="right">112.93</td>
+    <td align="right">0.0158</td>
+    <td align="right">55.13</td>
+    <td align="right">54.57</td>
+    <td align="right">55.58</td>
   </tr>
   <tr>
     <th></th>
@@ -525,72 +525,72 @@ This container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7383</td>
-    <td align="right">21.38</td>
-    <td align="right">22.45</td>
-    <td align="right">22.56</td>
+    <td align="right">24.26</td>
+    <td align="right">22.28</td>
+    <td align="right">22.21</td>
     <td align="center">5</td>
     <td align="right">3.0456</td>
-    <td align="right">34.62</td>
-    <td align="right">24.87</td>
-    <td align="right">24.37</td>
+    <td align="right">34.83</td>
+    <td align="right">24.33</td>
+    <td align="right">24.40</td>
     <td align="center">5</td>
     <td align="right">2.3196</td>
-    <td align="right">22.28</td>
-    <td align="right">23.34</td>
-    <td align="right">23.51</td>
+    <td align="right">22.68</td>
+    <td align="right">23.26</td>
+    <td align="right">23.50</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5398</td>
-    <td align="right">19.58</td>
-    <td align="right">22.28</td>
-    <td align="right">22.03</td>
+    <td align="right">19.13</td>
+    <td align="right">21.53</td>
+    <td align="right">21.52</td>
     <td align="center">6</td>
     <td align="right">0.8314</td>
-    <td align="right">42.87</td>
-    <td align="right">29.10</td>
-    <td align="right">29.22</td>
+    <td align="right">41.93</td>
+    <td align="right">28.82</td>
+    <td align="right">29.42</td>
     <td align="center">8</td>
     <td align="right">0.3752</td>
-    <td align="right">27.98</td>
-    <td align="right">30.99</td>
-    <td align="right">31.13</td>
+    <td align="right">28.13</td>
+    <td align="right">31.14</td>
+    <td align="right">31.12</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">8</td>
     <td align="right">0.1306</td>
-    <td align="right">21.83</td>
-    <td align="right">23.16</td>
-    <td align="right">23.95</td>
+    <td align="right">21.45</td>
+    <td align="right">23.59</td>
+    <td align="right">23.31</td>
     <td align="center">7</td>
     <td align="right">0.2897</td>
-    <td align="right">46.23</td>
-    <td align="right">34.55</td>
-    <td align="right">34.54</td>
+    <td align="right">45.76</td>
+    <td align="right">34.49</td>
+    <td align="right">33.96</td>
     <td align="center">11</td>
-    <td align="right">0.0633</td>
-    <td align="right">115.51</td>
-    <td align="right">122.15</td>
-    <td align="right">121.30</td>
+    <td align="right">0.0629</td>
+    <td align="right">52.56</td>
+    <td align="right">48.63</td>
+    <td align="right">48.61</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">8</td>
     <td align="right">0.0416</td>
-    <td align="right">22.83</td>
-    <td align="right">23.74</td>
-    <td align="right">24.43</td>
+    <td align="right">21.69</td>
+    <td align="right">23.81</td>
+    <td align="right">23.65</td>
     <td align="center">8</td>
     <td align="right">0.1216</td>
-    <td align="right">47.97</td>
-    <td align="right">31.13</td>
-    <td align="right">31.46</td>
+    <td align="right">48.39</td>
+    <td align="right">31.43</td>
+    <td align="right">31.45</td>
     <td align="center">14</td>
-    <td align="right">0.0120</td>
-    <td align="right">130.41</td>
-    <td align="right">136.89</td>
-    <td align="right">136.51</td>
+    <td align="right">0.0118</td>
+    <td align="right">55.20</td>
+    <td align="right">55.86</td>
+    <td align="right">55.82</td>
   </tr>
 </table>
