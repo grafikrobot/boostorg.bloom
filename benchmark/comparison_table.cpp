@@ -64,6 +64,7 @@ void resume_timing()
 #include <boost/unordered/unordered_flat_set.hpp>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 
 template<typename T>
@@ -78,6 +79,8 @@ struct unordered_flat_set_filter
   boost::unordered_flat_set<T> s;
 };
 
+static std::size_t num_elements;
+
 struct test_results
 {
   double fpr;                      /* % */
@@ -90,13 +93,12 @@ template<typename Filter>
 test_results test(std::size_t c)
 {
   using value_type=typename Filter::value_type;
-  static constexpr std::size_t N=10000000;
 
   std::vector<value_type> data_in,data_out;
   {
     boost::detail::splitmix64             rng;
     boost::unordered_flat_set<value_type> unique;
-    for(std::size_t i=0;i<N;++i){
+    for(std::size_t i=0;i<num_elements;++i){
       for(;;){
         auto x=value_type(rng());
         if(unique.insert(x).second){
@@ -105,7 +107,7 @@ test_results test(std::size_t c)
         }
       }
     }
-    for(std::size_t i=0;i<N;++i){
+    for(std::size_t i=0;i<num_elements;++i){
       for(;;){
         auto x=value_type(rng());
         if(!unique.contains(x)){
@@ -119,10 +121,10 @@ test_results test(std::size_t c)
   double fpr=0.0;
   {
     std::size_t res=0;
-    Filter f(c*N);
+    Filter f(c*num_elements);
     for(const auto& x:data_in)f.insert(x);
     for(const auto& x:data_out)res+=f.may_contain(x);
-    fpr=(double)res*100/N;
+    fpr=(double)res*100/num_elements;
   }
 
   double insertion_time=0.0;
@@ -130,7 +132,7 @@ test_results test(std::size_t c)
     double t=measure([&]{
       pause_timing();
       {
-        Filter f(c*N);
+        Filter f(c*num_elements);
         resume_timing();
         for(const auto& x:data_in)f.insert(x);
         pause_timing();
@@ -138,26 +140,26 @@ test_results test(std::size_t c)
       resume_timing();
       return 0;
     });
-    insertion_time=t/N*1E9;
+    insertion_time=t/num_elements*1E9;
   }
 
   double successful_lookup_time=0.0;
   double unsuccessful_lookup_time=0.0;
   {
-    Filter f(c*N);
+    Filter f(c*num_elements);
     for(const auto& x:data_in)f.insert(x);
     double t=measure([&]{
       std::size_t res=0;
       for(const auto& x:data_in)res+=f.may_contain(x);
       return res;
     });
-    successful_lookup_time=t/N*1E9;
+    successful_lookup_time=t/num_elements*1E9;
     t=measure([&]{
       std::size_t res=0;
       for(const auto& x:data_out)res+=f.may_contain(x);
       return res;
     });
-    unsuccessful_lookup_time=t/N*1E9;
+    unsuccessful_lookup_time=t/num_elements*1E9;
   }
 
   return {fpr,insertion_time,successful_lookup_time,unsuccessful_lookup_time};
@@ -219,8 +221,20 @@ using filters2=boost::mp11::mp_list<
   filter<int,boost::hash<int>,1,multiblock<boost::uint64_t,K3>,1>
 >;
 
-int main()
+int main(int argc,char* argv[])
 {
+  if(argc<2){
+    std::cerr<<"provide the number of elements\n";
+    return EXIT_FAILURE;
+  }
+  try{
+    num_elements=std::stoul(argv[1]);
+  }
+  catch(...){
+    std::cerr<<"wrong arg\n";
+    return EXIT_FAILURE;
+  }
+
   /* reference table: boost::unordered_flat_set */
 
   auto res=test<unordered_flat_set_filter<int>>(0);
