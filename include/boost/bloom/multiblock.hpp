@@ -24,28 +24,22 @@ struct multiblock:private detail::block_base<Block,K>
 
   static inline void mark(value_type& x,boost::uint64_t hash)
   {
-    auto h=hash;
-    for(std::size_t i=0;i<k;++i){
-      next(i,h,hash);
-      x[i]|=Block(1)<<(h&mask);
-    }
+    std::size_t i=0;
+    loop(hash,[&](boost::uint64_t h){x[i++]|=Block(1)<<(h&mask);});
   }
 
   static inline bool check(const value_type& x,boost::uint64_t hash)
   {
     Block res=1;
-    auto h=hash;
-    for(std::size_t i=0;i<k;++i){
-      next(i,h,hash);
-      res&=(x[i]>>(h&mask));
-    }
+    std::size_t i=0;
+    loop(hash,[&](boost::uint64_t h){res&=(x[i++]>>(h&mask));});
     return res;
   }
 
 private:
   using super=detail::block_base<Block,K>;
   using super::mask;
-  using super::next;
+  using super::loop;
 };
 
 } /* namespace bloom */

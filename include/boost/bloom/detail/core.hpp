@@ -184,6 +184,7 @@ protected:
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
   {
+    //if(BOOST_UNLIKELY(buckets==nullptr))return;
     hs.prepare_hash(hash);
     for(auto n=k;n--;){
       auto p=next_element(hash); /* modifies h */
@@ -193,6 +194,7 @@ protected:
 
   BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
   {
+    //if(BOOST_UNLIKELY(buckets==nullptr))return true;
     hs.prepare_hash(hash);
 #if 1
     auto p0=next_element(hash);

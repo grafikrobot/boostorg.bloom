@@ -9,6 +9,7 @@
 #ifndef BOOST_BLOOM_BLOCK_BASE_HPP
 #define BOOST_BLOOM_BLOCK_BASE_HPP
 
+#include <boost/config.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
 #include <boost/core/bit.hpp>
 #include <boost/cstdint.hpp>
@@ -18,28 +19,45 @@ namespace boost{
 namespace bloom{
 namespace detail{
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4714) /* marked as __forceinline not inlined */
+#endif
+
 // TODO: describe
 
 template<typename Block,std::size_t K>
 struct block_base
 {
+  static constexpr std::size_t k=K;
   static constexpr std::size_t hash_width=sizeof(boost::uint64_t)*CHAR_BIT;
   static constexpr std::size_t block_width=sizeof(Block)*CHAR_BIT;
   static constexpr std::size_t mask=block_width-1;
   static constexpr std::size_t shift=boost::core::bit_width(mask);
   static constexpr std::size_t rehash_k=(hash_width-shift)/shift;
 
-  static inline void next(
-    std::size_t i,boost::uint64_t& h,boost::uint64_t& hash)
+  template<typename F>
+  static BOOST_FORCEINLINE void loop(boost::uint64_t hash,F f)
   {
-    if(i&&(i%rehash_k)==0){
-      h=hash=detail::mulx64_mix(hash);
+    for(std::size_t i=0;i<k/rehash_k;++i){
+      auto h=hash;
+      for(std::size_t j=0;j<rehash_k;++j){
+        h>>=shift;
+        f(h);
+      }
+      hash=detail::mulx64_mix(hash);
     }
-    else{
+    auto h=hash;
+    for(std::size_t i=0;i<k%rehash_k;++i){
       h>>=shift;
+      f(h);
     }
   }
 };
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop) /* C4714 */
+#endif
 
 } /* namespace detail */
 } /* namespace bloom */
