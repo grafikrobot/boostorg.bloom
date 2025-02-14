@@ -165,17 +165,232 @@ All benchmarks run on a Windows 10 machine with 8GB RAM and an Intel Core i5-826
 release mode (see [benchmarking code](benchmark/comparison_table.cpp)).
 
 The tables show the FPR and execution times in nanoseconds per operation 
-for three different configurations of `boost::bloom::filter<int, boost::hash<int>, ...>`.
-The number of inserted elements is `N` = 10 million. Filters are constructed with a capacity
+for three different configurations of `boost::bloom::filter<int, boost::hash<int>, ...>`
+where `N` elements have been inserted. Filters are constructed with a capacity
 `c*N` (bits), so `c` is the number of bits used per element. For each combination of `c` and
 a given filter configuration, the optimum value of `K` (that yielding the minimum FPR)
 has been used.
 
 For reference, we provide also insertion, successful lookup and unsuccessful lookup times
-for a `boost::unordered_flat_set<int>` with `N` = 10 million elements.
-This container uses 63.75 bits per element.
+for a `boost::unordered_flat_set<int>` with the sanme number of elements `N`.
 
 ### 64-bit mode
+
+#### `N` = 1M elements
+
+The `boost::unordered_flat_set` container uses 79.69 bits per element.
+
+<table>
+  <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
+  <tr>
+    <th>insertion</th>
+    <th>successful<br/>lookup</th>
+    <th>unsuccessful<br/>lookup</th>
+  </tr>
+  <tr>
+    <td align="right">30.83</td>
+    <td align="right">15.97</td>
+    <td align="right">5.02</td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th></th>
+    <th colspan="5"><code>filter&lt;K></code></th>
+    <th colspan="5"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>
+    <th colspan="5"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>
+  </tr>
+  <tr>
+    <th>c</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+  </tr>
+  <tr>
+    <td align="center">8</td>
+    <td align="center">6</td>
+    <td align="right">2.1635</td>
+    <td align="right">10.72</td>
+    <td align="right">9.72</td>
+    <td align="right">15.96</td>
+    <td align="center">4</td>
+    <td align="right">3.3525</td>
+    <td align="right">3.39</td>
+    <td align="right">3.19</td>
+    <td align="right">3.24</td>
+    <td align="center">5</td>
+    <td align="right">2.4274</td>
+    <td align="right">3.60</td>
+    <td align="right">4.52</td>
+    <td align="right">4.37</td>
+  </tr>
+  <tr>
+    <td align="center">12</td>
+    <td align="center">9</td>
+    <td align="right">0.3151</td>
+    <td align="right">17.88</td>
+    <td align="right">12.88</td>
+    <td align="right">15.59</td>
+    <td align="center">5</td>
+    <td align="right">1.0369</td>
+    <td align="right">3.75</td>
+    <td align="right">3.47</td>
+    <td align="right">3.39</td>
+    <td align="center">8</td>
+    <td align="right">0.4244</td>
+    <td align="right">3.58</td>
+    <td align="right">4.69</td>
+    <td align="right">4.67</td>
+  </tr>
+  <tr>
+    <td align="center">16</td>
+    <td align="center">11</td>
+    <td align="right">0.0455</td>
+    <td align="right">20.41</td>
+    <td align="right">15.71</td>
+    <td align="right">14.38</td>
+    <td align="center">6</td>
+    <td align="right">0.4138</td>
+    <td align="right">4.16</td>
+    <td align="right">3.64</td>
+    <td align="right">3.75</td>
+    <td align="center">11</td>
+    <td align="right">0.0782</td>
+    <td align="right">9.08</td>
+    <td align="right">10.14</td>
+    <td align="right">7.24</td>
+  </tr>
+  <tr>
+    <td align="center">20</td>
+    <td align="center">14</td>
+    <td align="right">0.0084</td>
+    <td align="right">26.30</td>
+    <td align="right">22.27</td>
+    <td align="right">16.35</td>
+    <td align="center">7</td>
+    <td align="right">0.1936</td>
+    <td align="right">4.40</td>
+    <td align="right">3.90</td>
+    <td align="right">3.97</td>
+    <td align="center">14</td>
+    <td align="right">0.0163</td>
+    <td align="right">6.48</td>
+    <td align="right">8.84</td>
+    <td align="right">8.68</td>
+  </tr>
+  <tr>
+    <th></th>
+    <th colspan="5"><code>filter&lt;K,fast_multiblock32&ltK>></code></th>
+    <th colspan="5"><code>filter&lt;1,block&lt;uint64_t, K>,1></code></th>
+    <th colspan="5"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>
+  </tr>
+  <tr>
+    <th>c</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+  </tr>
+  <tr>
+    <td align="center">8</td>
+    <td align="center">5</td>
+    <td align="right">2.7392</td>
+    <td align="right">7.73</td>
+    <td align="right">7.04</td>
+    <td align="right">7.28</td>
+    <td align="center">5</td>
+    <td align="right">3.0417</td>
+    <td align="right">3.30</td>
+    <td align="right">3.14</td>
+    <td align="right">3.18</td>
+    <td align="center">5</td>
+    <td align="right">2.3163</td>
+    <td align="right">3.34</td>
+    <td align="right">4.41</td>
+    <td align="right">4.46</td>
+  </tr>
+  <tr>
+    <td align="center">12</td>
+    <td align="center">8</td>
+    <td align="right">0.5434</td>
+    <td align="right">2.86</td>
+    <td align="right">2.81</td>
+    <td align="right">2.74</td>
+    <td align="center">6</td>
+    <td align="right">0.8174</td>
+    <td align="right">3.87</td>
+    <td align="right">3.55</td>
+    <td align="right">3.56</td>
+    <td align="center">8</td>
+    <td align="right">0.3750</td>
+    <td align="right">3.74</td>
+    <td align="right">4.71</td>
+    <td align="right">4.69</td>
+  </tr>
+  <tr>
+    <td align="center">16</td>
+    <td align="center">8</td>
+    <td align="right">0.1346</td>
+    <td align="right">2.93</td>
+    <td align="right">2.79</td>
+    <td align="right">2.74</td>
+    <td align="center">7</td>
+    <td align="right">0.2812</td>
+    <td align="right">4.19</td>
+    <td align="right">3.87</td>
+    <td align="right">3.76</td>
+    <td align="center">11</td>
+    <td align="right">0.0681</td>
+    <td align="right">5.77</td>
+    <td align="right">6.97</td>
+    <td align="right">6.98</td>
+  </tr>
+  <tr>
+    <td align="center">20</td>
+    <td align="center">8</td>
+    <td align="right">0.0408</td>
+    <td align="right">2.83</td>
+    <td align="right">2.76</td>
+    <td align="right">2.94</td>
+    <td align="center">8</td>
+    <td align="right">0.1156</td>
+    <td align="right">4.79</td>
+    <td align="right">3.55</td>
+    <td align="right">3.53</td>
+    <td align="center">14</td>
+    <td align="right">0.0100</td>
+    <td align="right">6.36</td>
+    <td align="right">8.60</td>
+    <td align="right">8.85</td>
+  </tr>
+</table>
+
+#### `N` = 10M elements
+
+The `boost::unordered_flat_set` container uses 63.75 bits per element.
 
 <table>
   <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
@@ -386,6 +601,222 @@ This container uses 63.75 bits per element.
 </table>
 
 ### 32-bit mode
+
+#### `N` = 1M elements
+
+The `boost::unordered_flat_set` container uses 79.69 bits per element.
+
+<table>
+  <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
+  <tr>
+    <th>insertion</th>
+    <th>successful<br/>lookup</th>
+    <th>unsuccessful<br/>lookup</th>
+  </tr>
+  <tr>
+    <td align="right">32.52</td>
+    <td align="right">18.88</td>
+    <td align="right">5.41</td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th></th>
+    <th colspan="5"><code>filter&lt;K></code></th>
+    <th colspan="5"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>
+    <th colspan="5"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>
+  </tr>
+  <tr>
+    <th>c</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+  </tr>
+  <tr>
+    <td align="center">8</td>
+    <td align="center">6</td>
+    <td align="right">2.1546</td>
+    <td align="right">22.21</td>
+    <td align="right">21.97</td>
+    <td align="right">25.38</td>
+    <td align="center">4</td>
+    <td align="right">3.3200</td>
+    <td align="right">10.08</td>
+    <td align="right">6.81</td>
+    <td align="right">7.10</td>
+    <td align="center">5</td>
+    <td align="right">2.4144</td>
+    <td align="right">6.68</td>
+    <td align="right">8.60</td>
+    <td align="right">8.59</td>
+  </tr>
+  <tr>
+    <td align="center">12</td>
+    <td align="center">9</td>
+    <td align="right">0.3118</td>
+    <td align="right">25.87</td>
+    <td align="right">34.22</td>
+    <td align="right">25.15</td>
+    <td align="center">5</td>
+    <td align="right">1.0423</td>
+    <td align="right">11.32</td>
+    <td align="right">8.16</td>
+    <td align="right">8.24</td>
+    <td align="center">8</td>
+    <td align="right">0.4200</td>
+    <td align="right">6.13</td>
+    <td align="right">10.31</td>
+    <td align="right">10.39</td>
+  </tr>
+  <tr>
+    <td align="center">16</td>
+    <td align="center">11</td>
+    <td align="right">0.0453</td>
+    <td align="right">30.79</td>
+    <td align="right">40.36</td>
+    <td align="right">24.03</td>
+    <td align="center">6</td>
+    <td align="right">0.3972</td>
+    <td align="right">13.47</td>
+    <td align="right">10.89</td>
+    <td align="right">10.97</td>
+    <td align="center">11</td>
+    <td align="right">0.0783</td>
+    <td align="right">13.31</td>
+    <td align="right">16.67</td>
+    <td align="right">16.75</td>
+  </tr>
+  <tr>
+    <td align="center">20</td>
+    <td align="center">14</td>
+    <td align="right">0.0062</td>
+    <td align="right">38.55</td>
+    <td align="right">52.12</td>
+    <td align="right">24.83</td>
+    <td align="center">7</td>
+    <td align="right">0.1886</td>
+    <td align="right">14.39</td>
+    <td align="right">12.21</td>
+    <td align="right">12.07</td>
+    <td align="center">14</td>
+    <td align="right">0.0149</td>
+    <td align="right">12.70</td>
+    <td align="right">20.22</td>
+    <td align="right">19.79</td>
+  </tr>
+  <tr>
+    <th></th>
+    <th colspan="5"><code>filter&lt;K,fast_multiblock32&ltK>></code></th>
+    <th colspan="5"><code>filter&lt;1,block&lt;uint64_t, K>,1></code></th>
+    <th colspan="5"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>
+  </tr>
+  <tr>
+    <th>c</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+    <th>K</th>
+    <th>FPR<br/>[%]</th>
+    <th>ins.</th>
+    <th>succ.<br/>lkp.</th>
+    <th>uns.<br/>lkp.</th>
+  </tr>
+  <tr>
+    <td align="center">8</td>
+    <td align="center">5</td>
+    <td align="right">2.7556</td>
+    <td align="right">8.74</td>
+    <td align="right">9.67</td>
+    <td align="right">10.18</td>
+    <td align="center">5</td>
+    <td align="right">3.0416</td>
+    <td align="right">11.96</td>
+    <td align="right">8.50</td>
+    <td align="right">8.23</td>
+    <td align="center">5</td>
+    <td align="right">2.3251</td>
+    <td align="right">5.96</td>
+    <td align="right">8.33</td>
+    <td align="right">8.59</td>
+  </tr>
+  <tr>
+    <td align="center">12</td>
+    <td align="center">8</td>
+    <td align="right">0.5414</td>
+    <td align="right">4.39</td>
+    <td align="right">6.18</td>
+    <td align="right">6.05</td>
+    <td align="center">6</td>
+    <td align="right">0.8365</td>
+    <td align="right">12.44</td>
+    <td align="right">10.09</td>
+    <td align="right">10.03</td>
+    <td align="center">8</td>
+    <td align="right">0.3823</td>
+    <td align="right">6.40</td>
+    <td align="right">9.01</td>
+    <td align="right">8.96</td>
+  </tr>
+  <tr>
+    <td align="center">16</td>
+    <td align="center">8</td>
+    <td align="right">0.1293</td>
+    <td align="right">4.43</td>
+    <td align="right">6.27</td>
+    <td align="right">6.06</td>
+    <td align="center">7</td>
+    <td align="right">0.3024</td>
+    <td align="right">13.29</td>
+    <td align="right">12.00</td>
+    <td align="right">11.99</td>
+    <td align="center">11</td>
+    <td align="right">0.0671</td>
+    <td align="right">12.42</td>
+    <td align="right">16.76</td>
+    <td align="right">16.36</td>
+  </tr>
+  <tr>
+    <td align="center">20</td>
+    <td align="center">8</td>
+    <td align="right">0.0432</td>
+    <td align="right">4.45</td>
+    <td align="right">6.12</td>
+    <td align="right">6.15</td>
+    <td align="center">8</td>
+    <td align="right">0.1199</td>
+    <td align="right">14.77</td>
+    <td align="right">8.62</td>
+    <td align="right">8.67</td>
+    <td align="center">14</td>
+    <td align="right">0.0091</td>
+    <td align="right">12.14</td>
+    <td align="right">19.14</td>
+    <td align="right">19.40</td>
+  </tr>
+</table>
+
+#### `N` = 10M elements
+
+The `boost::unordered_flat_set` container uses 63.75 bits per element.
 
 <table>
   <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
