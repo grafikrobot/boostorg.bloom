@@ -296,10 +296,10 @@ int main(int argc,char* argv[])
     subheader<<
     "  </tr>\n";
 
-  row<filters2<5, 5,  5>>( 8);
-  row<filters2<8, 6,  8>>(12);
-  row<filters2<8, 7, 11>>(16);
-  row<filters2<8, 8, 14>>(20);
+  row<filters2< 5, 5,  5>>( 8);
+  row<filters2< 8, 6,  8>>(12);
+  row<filters2<11, 7, 11>>(16);
+  row<filters2<14, 8, 14>>(20);
 
   std::cout<<"</table>\n";
 }

@@ -12,6 +12,7 @@
 #include <boost/bloom/detail/avx2.hpp>
 
 #if defined(BOOST_BLOOM_AVX2)
+#include <boost/bloom/detail/mulx64.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
@@ -29,25 +30,35 @@ template<std::size_t K>
 struct fast_multiblock32
 {
   static constexpr std::size_t k=K;
-  static constexpr std::size_t max_k=8;
-  static_assert(K>0&&K<=max_k,"K must be between 1 and max_k");
-
-  using value_type=__m256i;
+  using value_type=__m256i[(k+7)/8];
   static constexpr std::size_t used_value_size=sizeof(boost::uint32_t)*k;
 
   static BOOST_FORCEINLINE void mark(value_type& x,boost::uint64_t hash)
   {
-    __m256i h=make(hash);
-    x=_mm256_or_si256(x,h);
+    for(int i=0;i<k/8;++i){
+      mark_m256i(x[i],hash,8);
+      hash=detail::mulx64_mix(hash);
+    }
+    if(k%8){
+      mark_m256i(x[k/8],hash,k%8);
+    }
   }
 
   static BOOST_FORCEINLINE bool check(const value_type& x,boost::uint64_t hash)
   {
-    return check(x,hash,std::integral_constant<bool,k==8>{});
+    for(int i=0;i<k/8;++i){
+      if(!check_m256i(x[i],hash,8))return false;
+      hash=detail::mulx64_mix(hash);
+    }
+    if(k%8){
+      if(!check_m256i(x[k/8],hash,k%8))return false;
+    }
+    return true;
   }
 
 private:
-  static BOOST_FORCEINLINE value_type make(boost::uint64_t hash)
+  static BOOST_FORCEINLINE __m256i make_m256i(
+    boost::uint64_t hash,std::size_t kp)
   {
     const __m256i ones[8]={
       _mm256_set_epi32(0,0,0,0,0,0,0,1),
@@ -71,32 +82,38 @@ private:
     __m256i h=_mm256_set1_epi64x(hash);
     h=_mm256_mullo_epi32(rehash,h);
     h=_mm256_srli_epi32(h,32-5);
-    return _mm256_sllv_epi32(ones[k-1],h);
+    return _mm256_sllv_epi32(ones[kp-1],h);
   }
 
-  static BOOST_FORCEINLINE bool check(
-    const value_type& x,boost::uint64_t hash,std::true_type /* k==8 */)
+  static BOOST_FORCEINLINE void mark_m256i(
+    __m256i& x,boost::uint64_t hash,std::size_t kp)
   {
-    __m256i h=make(hash);
-    return _mm256_testc_si256(x,h);
+    __m256i h=make_m256i(hash,kp);
+    x=_mm256_or_si256(x,h);
   }
 
-  static BOOST_FORCEINLINE bool check(
-    const value_type& x,boost::uint64_t hash,std::false_type /* k!=8 */)
+  static BOOST_FORCEINLINE bool check_m256i(
+    const __m256i& x,boost::uint64_t hash,std::size_t kp)
   {
-    const __m256i mask[7]={
-      _mm256_set_epi32(-1,-1,-1,-1,-1,-1,-1, 0),
-      _mm256_set_epi32(-1,-1,-1,-1,-1,-1, 0, 0),
-      _mm256_set_epi32(-1,-1,-1,-1,-1, 0, 0, 0),
-      _mm256_set_epi32(-1,-1,-1,-1, 0, 0, 0, 0),
-      _mm256_set_epi32(-1,-1,-1, 0, 0, 0, 0, 0),
-      _mm256_set_epi32(-1,-1, 0, 0, 0, 0, 0, 0),
-      _mm256_set_epi32(-1, 0, 0, 0, 0, 0, 0, 0)
-    };
+    if(kp==8){
+      __m256i h=make_m256i(hash,8);
+      return _mm256_testc_si256(x,h);
+    }
+    else{
+      const __m256i mask[7]={
+        _mm256_set_epi32(-1,-1,-1,-1,-1,-1,-1, 0),
+        _mm256_set_epi32(-1,-1,-1,-1,-1,-1, 0, 0),
+        _mm256_set_epi32(-1,-1,-1,-1,-1, 0, 0, 0),
+        _mm256_set_epi32(-1,-1,-1,-1, 0, 0, 0, 0),
+        _mm256_set_epi32(-1,-1,-1, 0, 0, 0, 0, 0),
+        _mm256_set_epi32(-1,-1, 0, 0, 0, 0, 0, 0),
+        _mm256_set_epi32(-1, 0, 0, 0, 0, 0, 0, 0)
+      };
 
-    __m256i h=make(hash);
-    __m256i y=_mm256_or_si256(mask[k-1],x);
-    return _mm256_testc_si256(y,h);
+      __m256i h=make_m256i(hash,kp);
+      __m256i y=_mm256_or_si256(mask[kp-1],x);
+      return _mm256_testc_si256(y,h);
+    }
   }
 };
 
