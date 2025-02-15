@@ -97,8 +97,7 @@ Statistically equivalent to `multiblock<uint32_t, K'>`, but uses a much
 faster SIMD-based algorithm when AVX2 is available. This algorithm is
 pretty much the same as that of [Apache Kudu](https://kudu.apache.org/)
 [`BlockBloomFilter`](https://github.com/apache/kudu/blob/master/src/kudu/util/block_bloom_filter_avx2.cc),
-but that implementation is fixed to `K'` = 8 whereas we accept
-any value between 1 and 8.
+but that implementation is fixed to `K'` = 8 whereas we accept any value.
 
 ## Estimating FPR
 
