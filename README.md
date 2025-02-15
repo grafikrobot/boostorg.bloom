@@ -62,7 +62,7 @@ array (in bytes), divided by `BucketSize`. When `BucketSize` is specified as zer
 the value `sizeof(Subfilter::value_type)` is used.
 
 The default configuration with `block<unsigned char,1>` corresponds to a
-classical Bloom filter setting K bits per elements uniformly distributed across
+classical Bloom filter setting `K` bits per elements uniformly distributed across
 the array.
 
 ### Overlapping buckets
