@@ -16,7 +16,6 @@
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
-#include <type_traits>
 
 namespace boost{
 namespace bloom{
