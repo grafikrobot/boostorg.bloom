@@ -179,6 +179,7 @@ for a `boost::unordered_flat_set<int>` with the sanme number of elements `N`.
 
 The `boost::unordered_flat_set` container uses 79.69 bits per element.
 
+
 <table>
   <tr><th colspan="3"><code>boost::unordered_flat_set</code></tr>
   <tr>
@@ -187,9 +188,9 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">30.83</td>
-    <td align="right">15.97</td>
-    <td align="right">5.02</td>
+    <td align="right">29.97</td>
+    <td align="right">16.25</td>
+    <td align="right">4.99</td>
   </tr>
 </table>
 <table>
@@ -221,73 +222,73 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1635</td>
-    <td align="right">10.72</td>
-    <td align="right">9.72</td>
-    <td align="right">15.96</td>
+    <td align="right">10.95</td>
+    <td align="right">9.95</td>
+    <td align="right">16.28</td>
     <td align="center">4</td>
     <td align="right">3.3525</td>
-    <td align="right">3.39</td>
-    <td align="right">3.19</td>
-    <td align="right">3.24</td>
+    <td align="right">3.43</td>
+    <td align="right">3.17</td>
+    <td align="right">3.18</td>
     <td align="center">5</td>
     <td align="right">2.4274</td>
-    <td align="right">3.60</td>
-    <td align="right">4.52</td>
-    <td align="right">4.37</td>
+    <td align="right">3.63</td>
+    <td align="right">4.54</td>
+    <td align="right">4.56</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3151</td>
-    <td align="right">17.88</td>
-    <td align="right">12.88</td>
-    <td align="right">15.59</td>
+    <td align="right">18.58</td>
+    <td align="right">14.25</td>
+    <td align="right">16.22</td>
     <td align="center">5</td>
     <td align="right">1.0369</td>
-    <td align="right">3.75</td>
-    <td align="right">3.47</td>
-    <td align="right">3.39</td>
+    <td align="right">3.76</td>
+    <td align="right">3.49</td>
+    <td align="right">3.52</td>
     <td align="center">8</td>
     <td align="right">0.4244</td>
-    <td align="right">3.58</td>
-    <td align="right">4.69</td>
-    <td align="right">4.67</td>
+    <td align="right">3.59</td>
+    <td align="right">4.80</td>
+    <td align="right">4.85</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0455</td>
-    <td align="right">20.41</td>
-    <td align="right">15.71</td>
-    <td align="right">14.38</td>
+    <td align="right">21.14</td>
+    <td align="right">17.38</td>
+    <td align="right">14.96</td>
     <td align="center">6</td>
     <td align="right">0.4138</td>
-    <td align="right">4.16</td>
-    <td align="right">3.64</td>
-    <td align="right">3.75</td>
+    <td align="right">4.13</td>
+    <td align="right">3.74</td>
+    <td align="right">3.73</td>
     <td align="center">11</td>
     <td align="right">0.0782</td>
-    <td align="right">9.08</td>
-    <td align="right">10.14</td>
-    <td align="right">7.24</td>
+    <td align="right">6.18</td>
+    <td align="right">7.46</td>
+    <td align="right">7.12</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0084</td>
-    <td align="right">26.30</td>
-    <td align="right">22.27</td>
-    <td align="right">16.35</td>
+    <td align="right">26.97</td>
+    <td align="right">22.71</td>
+    <td align="right">16.73</td>
     <td align="center">7</td>
     <td align="right">0.1936</td>
-    <td align="right">4.40</td>
-    <td align="right">3.90</td>
-    <td align="right">3.97</td>
+    <td align="right">4.56</td>
+    <td align="right">3.99</td>
+    <td align="right">3.96</td>
     <td align="center">14</td>
     <td align="right">0.0163</td>
-    <td align="right">6.48</td>
-    <td align="right">8.84</td>
-    <td align="right">8.68</td>
+    <td align="right">6.73</td>
+    <td align="right">9.15</td>
+    <td align="right">9.17</td>
   </tr>
   <tr>
     <th></th>
@@ -317,73 +318,73 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7392</td>
-    <td align="right">7.73</td>
-    <td align="right">7.04</td>
-    <td align="right">7.28</td>
+    <td align="right">7.95</td>
+    <td align="right">7.19</td>
+    <td align="right">7.26</td>
     <td align="center">5</td>
     <td align="right">3.0417</td>
+    <td align="right">3.46</td>
+    <td align="right">3.32</td>
     <td align="right">3.30</td>
-    <td align="right">3.14</td>
-    <td align="right">3.18</td>
     <td align="center">5</td>
     <td align="right">2.3163</td>
-    <td align="right">3.34</td>
-    <td align="right">4.41</td>
-    <td align="right">4.46</td>
+    <td align="right">3.43</td>
+    <td align="right">4.49</td>
+    <td align="right">4.57</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5434</td>
-    <td align="right">2.86</td>
-    <td align="right">2.81</td>
+    <td align="right">2.90</td>
     <td align="right">2.74</td>
+    <td align="right">2.75</td>
     <td align="center">6</td>
     <td align="right">0.8174</td>
-    <td align="right">3.87</td>
-    <td align="right">3.55</td>
-    <td align="right">3.56</td>
+    <td align="right">3.78</td>
+    <td align="right">3.50</td>
+    <td align="right">3.48</td>
     <td align="center">8</td>
     <td align="right">0.3750</td>
-    <td align="right">3.74</td>
-    <td align="right">4.71</td>
-    <td align="right">4.69</td>
+    <td align="right">4.05</td>
+    <td align="right">4.88</td>
+    <td align="right">4.92</td>
   </tr>
   <tr>
     <td align="center">16</td>
-    <td align="center">8</td>
-    <td align="right">0.1346</td>
-    <td align="right">2.93</td>
-    <td align="right">2.79</td>
-    <td align="right">2.74</td>
+    <td align="center">11</td>
+    <td align="right">0.1212</td>
+    <td align="right">8.58</td>
+    <td align="right">7.68</td>
+    <td align="right">4.08</td>
     <td align="center">7</td>
     <td align="right">0.2812</td>
-    <td align="right">4.19</td>
-    <td align="right">3.87</td>
-    <td align="right">3.76</td>
+    <td align="right">4.27</td>
+    <td align="right">3.90</td>
+    <td align="right">3.77</td>
     <td align="center">11</td>
     <td align="right">0.0681</td>
-    <td align="right">5.77</td>
-    <td align="right">6.97</td>
-    <td align="right">6.98</td>
+    <td align="right">6.15</td>
+    <td align="right">7.35</td>
+    <td align="right">7.35</td>
   </tr>
   <tr>
     <td align="center">20</td>
-    <td align="center">8</td>
-    <td align="right">0.0408</td>
-    <td align="right">2.83</td>
-    <td align="right">2.76</td>
-    <td align="right">2.94</td>
+    <td align="center">14</td>
+    <td align="right">0.0287</td>
+    <td align="right">5.15</td>
+    <td align="right">6.03</td>
+    <td align="right">3.73</td>
     <td align="center">8</td>
     <td align="right">0.1156</td>
     <td align="right">4.79</td>
-    <td align="right">3.55</td>
-    <td align="right">3.53</td>
+    <td align="right">3.77</td>
+    <td align="right">3.78</td>
     <td align="center">14</td>
     <td align="right">0.0100</td>
-    <td align="right">6.36</td>
-    <td align="right">8.60</td>
-    <td align="right">8.85</td>
+    <td align="right">6.67</td>
+    <td align="right">8.86</td>
+    <td align="right">8.90</td>
   </tr>
 </table>
 
@@ -399,9 +400,9 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">81.78</td>
-    <td align="right">32.78</td>
-    <td align="right">16.29</td>
+    <td align="right">76.08</td>
+    <td align="right">32.90</td>
+    <td align="right">16.31</td>
   </tr>
 </table>
 <table>
@@ -433,73 +434,73 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1566</td>
-    <td align="right">62.91</td>
-    <td align="right">43.83</td>
-    <td align="right">29.88</td>
+    <td align="right">57.43</td>
+    <td align="right">39.09</td>
+    <td align="right">29.60</td>
     <td align="center">4</td>
     <td align="right">3.3462</td>
-    <td align="right">13.49</td>
-    <td align="right">10.45</td>
-    <td align="right">10.29</td>
+    <td align="right">13.27</td>
+    <td align="right">10.46</td>
+    <td align="right">10.42</td>
     <td align="center">5</td>
     <td align="right">2.4515</td>
-    <td align="right">15.47</td>
-    <td align="right">13.92</td>
-    <td align="right">13.90</td>
+    <td align="right">16.04</td>
+    <td align="right">13.42</td>
+    <td align="right">13.48</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3146</td>
-    <td align="right">114.18</td>
-    <td align="right">68.75</td>
-    <td align="right">36.60</td>
+    <td align="right">113.52</td>
+    <td align="right">68.16</td>
+    <td align="right">36.52</td>
     <td align="center">5</td>
     <td align="right">1.0310</td>
-    <td align="right">17.89</td>
-    <td align="right">12.70</td>
-    <td align="right">12.45</td>
+    <td align="right">17.22</td>
+    <td align="right">12.84</td>
+    <td align="right">12.85</td>
     <td align="center">8</td>
     <td align="right">0.4244</td>
-    <td align="right">16.65</td>
-    <td align="right">14.19</td>
-    <td align="right">14.51</td>
+    <td align="right">16.77</td>
+    <td align="right">14.61</td>
+    <td align="right">14.75</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0456</td>
-    <td align="right">157.34</td>
-    <td align="right">93.70</td>
-    <td align="right">38.43</td>
+    <td align="right">155.65</td>
+    <td align="right">93.55</td>
+    <td align="right">37.27</td>
     <td align="center">6</td>
     <td align="right">0.4035</td>
-    <td align="right">19.64</td>
-    <td align="right">15.18</td>
-    <td align="right">14.61</td>
+    <td align="right">19.37</td>
+    <td align="right">14.41</td>
+    <td align="right">14.40</td>
     <td align="center">11</td>
     <td align="right">0.0776</td>
-    <td align="right">33.42</td>
-    <td align="right">24.63</td>
-    <td align="right">24.53</td>
+    <td align="right">33.05</td>
+    <td align="right">24.51</td>
+    <td align="right">24.55</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0066</td>
-    <td align="right">212.80</td>
-    <td align="right">127.66</td>
-    <td align="right">40.25</td>
+    <td align="right">212.09</td>
+    <td align="right">128.59</td>
+    <td align="right">41.87</td>
     <td align="center">7</td>
     <td align="right">0.1879</td>
-    <td align="right">20.96</td>
-    <td align="right">15.02</td>
-    <td align="right">15.04</td>
+    <td align="right">20.85</td>
+    <td align="right">15.03</td>
+    <td align="right">15.30</td>
     <td align="center">14</td>
     <td align="right">0.0153</td>
     <td align="right">37.16</td>
-    <td align="right">30.01</td>
-    <td align="right">29.95</td>
+    <td align="right">30.96</td>
+    <td align="right">31.03</td>
   </tr>
   <tr>
     <th></th>
@@ -529,73 +530,73 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7367</td>
-    <td align="right">15.58</td>
-    <td align="right">12.13</td>
-    <td align="right">12.25</td>
+    <td align="right">15.95</td>
+    <td align="right">12.30</td>
+    <td align="right">12.23</td>
     <td align="center">5</td>
     <td align="right">3.0580</td>
-    <td align="right">14.82</td>
-    <td align="right">11.47</td>
-    <td align="right">11.44</td>
+    <td align="right">15.07</td>
+    <td align="right">11.77</td>
+    <td align="right">11.95</td>
     <td align="center">5</td>
     <td align="right">2.3256</td>
-    <td align="right">15.58</td>
-    <td align="right">12.98</td>
-    <td align="right">12.94</td>
+    <td align="right">15.88</td>
+    <td align="right">13.14</td>
+    <td align="right">13.29</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5399</td>
-    <td align="right">14.68</td>
-    <td align="right">10.84</td>
-    <td align="right">11.78</td>
+    <td align="right">15.02</td>
+    <td align="right">11.46</td>
+    <td align="right">11.40</td>
     <td align="center">6</td>
     <td align="right">0.8253</td>
-    <td align="right">19.41</td>
-    <td align="right">14.57</td>
-    <td align="right">14.67</td>
+    <td align="right">19.80</td>
+    <td align="right">14.82</td>
+    <td align="right">14.85</td>
     <td align="center">8</td>
     <td align="right">0.3777</td>
-    <td align="right">22.60</td>
-    <td align="right">16.45</td>
-    <td align="right">15.94</td>
+    <td align="right">22.72</td>
+    <td align="right">15.83</td>
+    <td align="right">15.82</td>
   </tr>
   <tr>
     <td align="center">16</td>
-    <td align="center">8</td>
-    <td align="right">0.1314</td>
-    <td align="right">17.81</td>
-    <td align="right">12.00</td>
-    <td align="right">11.98</td>
+    <td align="center">11</td>
+    <td align="right">0.1170</td>
+    <td align="right">26.48</td>
+    <td align="right">20.64</td>
+    <td align="right">17.34</td>
     <td align="center">7</td>
     <td align="right">0.2891</td>
-    <td align="right">23.33</td>
-    <td align="right">16.53</td>
-    <td align="right">16.41</td>
+    <td align="right">21.43</td>
+    <td align="right">16.47</td>
+    <td align="right">16.46</td>
     <td align="center">11</td>
     <td align="right">0.0643</td>
-    <td align="right">34.14</td>
-    <td align="right">24.44</td>
-    <td align="right">24.43</td>
+    <td align="right">34.25</td>
+    <td align="right">25.10</td>
+    <td align="right">24.72</td>
   </tr>
   <tr>
     <td align="center">20</td>
-    <td align="center">8</td>
-    <td align="right">0.0421</td>
-    <td align="right">17.22</td>
-    <td align="right">12.06</td>
-    <td align="right">12.07</td>
+    <td align="center">14</td>
+    <td align="right">0.0276</td>
+    <td align="right">27.59</td>
+    <td align="right">21.11</td>
+    <td align="right">15.72</td>
     <td align="center">8</td>
     <td align="right">0.1213</td>
-    <td align="right">23.56</td>
-    <td align="right">16.17</td>
-    <td align="right">16.05</td>
+    <td align="right">23.87</td>
+    <td align="right">16.50</td>
+    <td align="right">16.47</td>
     <td align="center">14</td>
     <td align="right">0.0119</td>
-    <td align="right">38.18</td>
-    <td align="right">30.82</td>
-    <td align="right">31.75</td>
+    <td align="right">38.08</td>
+    <td align="right">31.57</td>
+    <td align="right">31.83</td>
   </tr>
 </table>
 
@@ -613,9 +614,9 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">32.52</td>
-    <td align="right">18.88</td>
-    <td align="right">5.41</td>
+    <td align="right">34.08</td>
+    <td align="right">18.32</td>
+    <td align="right">5.34</td>
   </tr>
 </table>
 <table>
@@ -647,73 +648,73 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1546</td>
-    <td align="right">22.21</td>
-    <td align="right">21.97</td>
-    <td align="right">25.38</td>
+    <td align="right">23.20</td>
+    <td align="right">22.80</td>
+    <td align="right">25.90</td>
     <td align="center">4</td>
     <td align="right">3.3200</td>
-    <td align="right">10.08</td>
-    <td align="right">6.81</td>
-    <td align="right">7.10</td>
+    <td align="right">10.26</td>
+    <td align="right">6.69</td>
+    <td align="right">6.73</td>
     <td align="center">5</td>
     <td align="right">2.4144</td>
-    <td align="right">6.68</td>
-    <td align="right">8.60</td>
-    <td align="right">8.59</td>
+    <td align="right">6.98</td>
+    <td align="right">8.85</td>
+    <td align="right">8.76</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3118</td>
-    <td align="right">25.87</td>
-    <td align="right">34.22</td>
-    <td align="right">25.15</td>
+    <td align="right">25.90</td>
+    <td align="right">34.39</td>
+    <td align="right">25.99</td>
     <td align="center">5</td>
     <td align="right">1.0423</td>
-    <td align="right">11.32</td>
-    <td align="right">8.16</td>
-    <td align="right">8.24</td>
+    <td align="right">11.53</td>
+    <td align="right">8.35</td>
+    <td align="right">8.47</td>
     <td align="center">8</td>
     <td align="right">0.4200</td>
-    <td align="right">6.13</td>
-    <td align="right">10.31</td>
-    <td align="right">10.39</td>
+    <td align="right">6.28</td>
+    <td align="right">10.55</td>
+    <td align="right">10.56</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0453</td>
-    <td align="right">30.79</td>
-    <td align="right">40.36</td>
-    <td align="right">24.03</td>
+    <td align="right">31.76</td>
+    <td align="right">41.61</td>
+    <td align="right">24.98</td>
     <td align="center">6</td>
     <td align="right">0.3972</td>
-    <td align="right">13.47</td>
-    <td align="right">10.89</td>
-    <td align="right">10.97</td>
+    <td align="right">13.20</td>
+    <td align="right">11.15</td>
+    <td align="right">11.27</td>
     <td align="center">11</td>
     <td align="right">0.0783</td>
-    <td align="right">13.31</td>
-    <td align="right">16.67</td>
-    <td align="right">16.75</td>
+    <td align="right">13.68</td>
+    <td align="right">17.24</td>
+    <td align="right">17.20</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0062</td>
-    <td align="right">38.55</td>
-    <td align="right">52.12</td>
-    <td align="right">24.83</td>
+    <td align="right">40.04</td>
+    <td align="right">50.53</td>
+    <td align="right">24.49</td>
     <td align="center">7</td>
     <td align="right">0.1886</td>
-    <td align="right">14.39</td>
-    <td align="right">12.21</td>
-    <td align="right">12.07</td>
+    <td align="right">14.40</td>
+    <td align="right">12.32</td>
+    <td align="right">12.42</td>
     <td align="center">14</td>
     <td align="right">0.0149</td>
-    <td align="right">12.70</td>
-    <td align="right">20.22</td>
-    <td align="right">19.79</td>
+    <td align="right">13.00</td>
+    <td align="right">20.51</td>
+    <td align="right">20.41</td>
   </tr>
   <tr>
     <th></th>
@@ -743,73 +744,73 @@ The `boost::unordered_flat_set` container uses 79.69 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7556</td>
-    <td align="right">8.74</td>
-    <td align="right">9.67</td>
-    <td align="right">10.18</td>
+    <td align="right">9.01</td>
+    <td align="right">9.89</td>
+    <td align="right">9.86</td>
     <td align="center">5</td>
     <td align="right">3.0416</td>
-    <td align="right">11.96</td>
-    <td align="right">8.50</td>
-    <td align="right">8.23</td>
+    <td align="right">11.54</td>
+    <td align="right">8.48</td>
+    <td align="right">8.39</td>
     <td align="center">5</td>
     <td align="right">2.3251</td>
-    <td align="right">5.96</td>
-    <td align="right">8.33</td>
-    <td align="right">8.59</td>
+    <td align="right">6.21</td>
+    <td align="right">8.48</td>
+    <td align="right">8.50</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5414</td>
-    <td align="right">4.39</td>
-    <td align="right">6.18</td>
-    <td align="right">6.05</td>
+    <td align="right">4.48</td>
+    <td align="right">6.20</td>
+    <td align="right">6.13</td>
     <td align="center">6</td>
     <td align="right">0.8365</td>
-    <td align="right">12.44</td>
-    <td align="right">10.09</td>
-    <td align="right">10.03</td>
+    <td align="right">12.76</td>
+    <td align="right">10.19</td>
+    <td align="right">10.19</td>
     <td align="center">8</td>
     <td align="right">0.3823</td>
     <td align="right">6.40</td>
-    <td align="right">9.01</td>
-    <td align="right">8.96</td>
+    <td align="right">9.11</td>
+    <td align="right">9.22</td>
   </tr>
   <tr>
     <td align="center">16</td>
-    <td align="center">8</td>
-    <td align="right">0.1293</td>
-    <td align="right">4.43</td>
-    <td align="right">6.27</td>
-    <td align="right">6.06</td>
+    <td align="center">11</td>
+    <td align="right">0.1201</td>
+    <td align="right">12.60</td>
+    <td align="right">12.64</td>
+    <td align="right">7.88</td>
     <td align="center">7</td>
     <td align="right">0.3024</td>
-    <td align="right">13.29</td>
-    <td align="right">12.00</td>
-    <td align="right">11.99</td>
+    <td align="right">13.65</td>
+    <td align="right">12.33</td>
+    <td align="right">12.34</td>
     <td align="center">11</td>
     <td align="right">0.0671</td>
-    <td align="right">12.42</td>
-    <td align="right">16.76</td>
-    <td align="right">16.36</td>
+    <td align="right">12.78</td>
+    <td align="right">16.48</td>
+    <td align="right">16.52</td>
   </tr>
   <tr>
     <td align="center">20</td>
-    <td align="center">8</td>
-    <td align="right">0.0432</td>
-    <td align="right">4.45</td>
-    <td align="right">6.12</td>
-    <td align="right">6.15</td>
+    <td align="center">14</td>
+    <td align="right">0.0291</td>
+    <td align="right">9.55</td>
+    <td align="right">12.11</td>
+    <td align="right">7.37</td>
     <td align="center">8</td>
     <td align="right">0.1199</td>
-    <td align="right">14.77</td>
-    <td align="right">8.62</td>
-    <td align="right">8.67</td>
+    <td align="right">15.36</td>
+    <td align="right">8.73</td>
+    <td align="right">8.78</td>
     <td align="center">14</td>
     <td align="right">0.0091</td>
-    <td align="right">12.14</td>
-    <td align="right">19.14</td>
-    <td align="right">19.40</td>
+    <td align="right">12.38</td>
+    <td align="right">19.75</td>
+    <td align="right">19.67</td>
   </tr>
 </table>
 
@@ -825,9 +826,9 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <th>unsuccessful<br/>lookup</th>
   </tr>
   <tr>
-    <td align="right">87.61</td>
-    <td align="right">38.44</td>
-    <td align="right">17.42</td>
+    <td align="right">78.63</td>
+    <td align="right">38.49</td>
+    <td align="right">17.33</td>
   </tr>
 </table>
 <table>
@@ -859,73 +860,73 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">6</td>
     <td align="right">2.1489</td>
-    <td align="right">80.30</td>
-    <td align="right">77.15</td>
-    <td align="right">49.44</td>
+    <td align="right">85.90</td>
+    <td align="right">81.33</td>
+    <td align="right">48.20</td>
     <td align="center">4</td>
     <td align="right">3.3441</td>
-    <td align="right">31.90</td>
-    <td align="right">19.27</td>
-    <td align="right">19.25</td>
+    <td align="right">32.08</td>
+    <td align="right">19.32</td>
+    <td align="right">19.47</td>
     <td align="center">5</td>
     <td align="right">2.4525</td>
-    <td align="right">23.87</td>
-    <td align="right">22.40</td>
-    <td align="right">22.37</td>
+    <td align="right">24.20</td>
+    <td align="right">22.54</td>
+    <td align="right">22.56</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">9</td>
     <td align="right">0.3184</td>
-    <td align="right">141.30</td>
-    <td align="right">134.50</td>
-    <td align="right">59.77</td>
+    <td align="right">137.07</td>
+    <td align="right">134.16</td>
+    <td align="right">59.73</td>
     <td align="center">5</td>
     <td align="right">1.0317</td>
-    <td align="right">38.74</td>
-    <td align="right">27.25</td>
-    <td align="right">27.16</td>
+    <td align="right">38.20</td>
+    <td align="right">27.28</td>
+    <td align="right">27.27</td>
     <td align="center">8</td>
     <td align="right">0.4209</td>
-    <td align="right">23.50</td>
-    <td align="right">28.41</td>
-    <td align="right">28.25</td>
+    <td align="right">22.92</td>
+    <td align="right">28.81</td>
+    <td align="right">28.68</td>
   </tr>
   <tr>
     <td align="center">16</td>
     <td align="center">11</td>
     <td align="right">0.0455</td>
-    <td align="right">191.88</td>
-    <td align="right">176.28</td>
-    <td align="right">59.54</td>
+    <td align="right">183.98</td>
+    <td align="right">177.12</td>
+    <td align="right">60.84</td>
     <td align="center">6</td>
     <td align="right">0.4015</td>
-    <td align="right">43.23</td>
-    <td align="right">29.18</td>
-    <td align="right">29.29</td>
+    <td align="right">42.75</td>
+    <td align="right">28.83</td>
+    <td align="right">29.70</td>
     <td align="center">11</td>
     <td align="right">0.0783</td>
-    <td align="right">53.02</td>
-    <td align="right">49.14</td>
-    <td align="right">49.17</td>
+    <td align="right">52.50</td>
+    <td align="right">49.11</td>
+    <td align="right">48.99</td>
   </tr>
   <tr>
     <td align="center">20</td>
     <td align="center">14</td>
     <td align="right">0.0068</td>
-    <td align="right">258.90</td>
-    <td align="right">234.95</td>
-    <td align="right">66.02</td>
+    <td align="right">246.14</td>
+    <td align="right">230.24</td>
+    <td align="right">64.08</td>
     <td align="center">7</td>
     <td align="right">0.1883</td>
-    <td align="right">60.00</td>
-    <td align="right">34.54</td>
-    <td align="right">34.65</td>
+    <td align="right">46.26</td>
+    <td align="right">33.50</td>
+    <td align="right">33.37</td>
     <td align="center">14</td>
     <td align="right">0.0158</td>
-    <td align="right">55.13</td>
-    <td align="right">54.57</td>
-    <td align="right">55.58</td>
+    <td align="right">52.51</td>
+    <td align="right">54.27</td>
+    <td align="right">54.89</td>
   </tr>
   <tr>
     <th></th>
@@ -955,72 +956,73 @@ The `boost::unordered_flat_set` container uses 63.75 bits per element.
     <td align="center">8</td>
     <td align="center">5</td>
     <td align="right">2.7383</td>
-    <td align="right">24.26</td>
-    <td align="right">22.28</td>
-    <td align="right">22.21</td>
+    <td align="right">21.18</td>
+    <td align="right">21.74</td>
+    <td align="right">21.38</td>
     <td align="center">5</td>
     <td align="right">3.0456</td>
-    <td align="right">34.83</td>
-    <td align="right">24.33</td>
-    <td align="right">24.40</td>
+    <td align="right">32.69</td>
+    <td align="right">23.15</td>
+    <td align="right">23.22</td>
     <td align="center">5</td>
     <td align="right">2.3196</td>
-    <td align="right">22.68</td>
-    <td align="right">23.26</td>
-    <td align="right">23.50</td>
+    <td align="right">21.79</td>
+    <td align="right">23.25</td>
+    <td align="right">23.14</td>
   </tr>
   <tr>
     <td align="center">12</td>
     <td align="center">8</td>
     <td align="right">0.5398</td>
     <td align="right">19.13</td>
-    <td align="right">21.53</td>
-    <td align="right">21.52</td>
+    <td align="right">21.88</td>
+    <td align="right">21.87</td>
     <td align="center">6</td>
     <td align="right">0.8314</td>
-    <td align="right">41.93</td>
-    <td align="right">28.82</td>
-    <td align="right">29.42</td>
+    <td align="right">40.98</td>
+    <td align="right">28.54</td>
+    <td align="right">28.38</td>
     <td align="center">8</td>
     <td align="right">0.3752</td>
-    <td align="right">28.13</td>
-    <td align="right">31.14</td>
-    <td align="right">31.12</td>
+    <td align="right">26.84</td>
+    <td align="right">30.85</td>
+    <td align="right">30.51</td>
   </tr>
   <tr>
     <td align="center">16</td>
-    <td align="center">8</td>
-    <td align="right">0.1306</td>
-    <td align="right">21.45</td>
-    <td align="right">23.59</td>
-    <td align="right">23.31</td>
+    <td align="center">11</td>
+    <td align="right">0.1192</td>
+    <td align="right">39.34</td>
+    <td align="right">36.91</td>
+    <td align="right">26.92</td>
     <td align="center">7</td>
     <td align="right">0.2897</td>
-    <td align="right">45.76</td>
-    <td align="right">34.49</td>
-    <td align="right">33.96</td>
+    <td align="right">45.32</td>
+    <td align="right">33.73</td>
+    <td align="right">33.60</td>
     <td align="center">11</td>
     <td align="right">0.0629</td>
-    <td align="right">52.56</td>
-    <td align="right">48.63</td>
-    <td align="right">48.61</td>
+    <td align="right">52.77</td>
+    <td align="right">48.75</td>
+    <td align="right">48.19</td>
   </tr>
   <tr>
     <td align="center">20</td>
-    <td align="center">8</td>
-    <td align="right">0.0416</td>
-    <td align="right">21.69</td>
-    <td align="right">23.81</td>
-    <td align="right">23.65</td>
+    <td align="center">14</td>
+    <td align="right">0.0275</td>
+    <td align="right">38.61</td>
+    <td align="right">41.07</td>
+    <td align="right">25.72</td>
     <td align="center">8</td>
     <td align="right">0.1216</td>
-    <td align="right">48.39</td>
-    <td align="right">31.43</td>
-    <td align="right">31.45</td>
+    <td align="right">49.14</td>
+    <td align="right">31.42</td>
+    <td align="right">31.29</td>
     <td align="center">14</td>
     <td align="right">0.0118</td>
-    <td align="right">55.20</td>
-    <td align="right">55.86</td>
-    <td align="right">55.82</td>
+    <td align="right">55.41</td>
+    <td align="right">55.42</td>
+    <td align="right">54.70</td>
   </tr>
 </table>
+
