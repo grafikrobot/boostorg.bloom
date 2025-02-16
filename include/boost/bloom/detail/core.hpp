@@ -21,6 +21,7 @@
 #include <cstring>
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 /* We use BOOST_BLOOM_PREFETCH[_WRITE] macros rather than proper
  * functions because of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109985
@@ -67,7 +68,7 @@ namespace detail{
 
 struct mcg_and_fastrange
 {
-  mcg_and_fastrange(std::size_t m)noexcept:
+  constexpr mcg_and_fastrange(std::size_t m)noexcept:
     rng{
       m+(
         (m%8<=3)?3-(m%8):
@@ -76,7 +77,7 @@ struct mcg_and_fastrange
     }
     {}
 
-  inline std::size_t range()const noexcept{return (std::size_t)rng;}
+  inline constexpr std::size_t range()const noexcept{return (std::size_t)rng;}
 
   inline void prepare_hash(boost::uint64_t& hash)const noexcept
   {
@@ -122,6 +123,16 @@ inline constexpr std::size_t gcd_pow2(std::size_t x,std::size_t p)
   return (x&(0-x))<p?(x&(0-x)):p;
 }
 
+/* used for construction of a dummy array with all bits set to 1 */
+
+struct full_byte{unsigned char x=0xFF;};
+
+struct filter_array
+{
+  unsigned char* data;
+  unsigned char* buckets; /* adjusted from data for proper alignment */
+};
+
 template<
   std::size_t K,typename Subfilter,std::size_t BucketSize,typename Allocator
 >
@@ -159,42 +170,75 @@ protected:
   using allocator_type=Allocator;
   using size_type=std::size_t;
   using difference_type=std::ptrdiff_t;
-  using pointer=allocator_pointer_t<allocator_type>;
-  using const_pointer=allocator_const_pointer_t<allocator_type>;
+  using pointer=unsigned char*;
+  using const_pointer=const unsigned char*;
 
   filter_core(std::size_t m,const allocator_type& al_):
     allocator_base{empty_init,al_},
-    hs{((m+CHAR_BIT-1)/CHAR_BIT+bucket_size-1)/bucket_size}
+    hs{((m+CHAR_BIT-1)/CHAR_BIT+bucket_size-1)/bucket_size},
+    ar{new_array(al(),m?hs.range():0)}
   {
-    std::size_t spc=space_for(hs.range());
-    data_=allocator_allocate(al(),spc);
-    std::memset(data_,0,spc);
-    buckets=buckets_for(data_);
+    if(ar.data)std::memset(ar.data,0,space_for(hs.range()));
+  }
+
+  filter_core(const filter_core& x):
+    filter_core{x,select_on_container_copy_construction(x.al())}{}
+
+  filter_core(filter_core&& x):filter_core{std::move(x),x.al()}{}
+
+  filter_core(const filter_core& x,const allocator_type& al_):
+    allocator_base{empty_init,al_},
+    hs{x.hs},
+    ar{new_array(al(),x.ar.data?x.hs.range():0)}
+  {
+    if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(hs.range()));
+  }
+
+  filter_core(filter_core&& x,const allocator_type& al_):
+    allocator_base{empty_init,al_},
+    hs{x.hs}
+  {
+    auto empty_ar=new_array(x.al(),0); /* we're relying on this not throwing */
+    if(al()==x.al()){
+      ar=x.ar;
+    }
+    else{
+      ar=new_array(al(),x.ar.data?x.hs.range():0);
+      if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(hs.range()));
+      delete_array(x.al(),x.ar,x.hs.range());
+    }
+    x.hs=hash_strategy{0};
+    x.ar=empty_ar;
   }
 
   ~filter_core()
   {
-    allocator_deallocate(al(),data_,space_for(hs.range()));
+    delete_array(al(),ar,hs.range());
   }
 
   std::size_t capacity()const noexcept
   {
-    return hs.range()*CHAR_BIT;
+    return ar.data!=nullptr?hs.range()*CHAR_BIT:0;
   }
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
   {
-    //if(BOOST_UNLIKELY(buckets==nullptr))return;
     hs.prepare_hash(hash);
     for(auto n=k;n--;){
       auto p=next_element(hash); /* modifies h */
+      /* We do the unhappy-path null check here rather than at the beginning
+       * of the function because prefetch completion wait gives us free CPU
+       * cycles to spare.
+       */
+
+      if(BOOST_UNLIKELY(ar.data==nullptr))return;
+
       set(p,hash);
     }
   }
 
   BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
   {
-    //if(BOOST_UNLIKELY(buckets==nullptr))return true;
     hs.prepare_hash(hash);
 #if 1
     auto p0=next_element(hash);
@@ -219,6 +263,34 @@ private:
   using allocator_base=empty_value<Allocator,0>;
 
   Allocator& al(){return allocator_base::get();}
+
+  static filter_array new_array(allocator_type& al,std::size_t n)
+  {
+    filter_array res;
+    if(n){
+      std::size_t spc=space_for(n);
+      res.data=allocator_allocate(al,spc);
+      res.buckets=buckets_for(res.data);
+    }
+    else{
+      /* To avoid dynamic allocation for zero capacity or moved-from filters,
+       * we point buckets to a statically allocated dummy array. This is
+       * good for read operations but not so for write operations, where
+       * we need to resort to a null check on data.
+       */
+
+      static full_byte dummy[space_for(hash_strategy{0}.range())];
+
+      res.data=nullptr; 
+      res.buckets=buckets_for(reinterpret_cast<unsigned char*>(&dummy));
+    }
+    return res;
+  }
+
+  static void delete_array(allocator_type& al,const filter_array& ar,std::size_t n)
+  {
+    if(ar.data!=nullptr)allocator_deallocate(al,ar.data,space_for(n));
+  }
 
   static constexpr std::size_t space_for(std::size_t rng)
   {
@@ -277,7 +349,7 @@ private:
 
   BOOST_FORCEINLINE unsigned char* next_element(boost::uint64_t& h)
   {
-    auto p=buckets+hs.next_position(h)*bucket_size;
+    auto p=ar.buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH_WRITE((unsigned char*)p+i*cacheline);
     }
@@ -286,7 +358,7 @@ private:
 
   BOOST_FORCEINLINE const unsigned char* next_element(boost::uint64_t& h)const
   {
-    auto p=buckets+hs.next_position(h)*bucket_size;
+    auto p=ar.buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH((unsigned char*)p+i*cacheline);
     }
@@ -294,7 +366,7 @@ private:
   }
 
   hash_strategy hs;
-  pointer       data_,buckets;
+  filter_array  ar;
 };
 
 #if defined(BOOST_MSVC)
