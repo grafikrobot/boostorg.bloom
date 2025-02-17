@@ -231,7 +231,7 @@ protected:
        * cycles to spare.
        */
 
-      if(BOOST_UNLIKELY(ar.data==nullptr))return;
+      if(BOOST_UNLIKELY(n==k-1&&ar.data==nullptr))return;
 
       set(p,hash);
     }
