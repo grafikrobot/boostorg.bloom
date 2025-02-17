@@ -11,6 +11,7 @@
 #ifndef BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
 #define BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
 
+#include <boost/assert.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
 #include <boost/bloom/detail/sse2.hpp>
 #include <boost/config.hpp>
@@ -20,6 +21,7 @@
 #include <boost/cstdint.hpp>
 #include <cstring>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -133,6 +135,32 @@ struct filter_array
   unsigned char* buckets; /* adjusted from data for proper alignment */
 };
 
+struct if_constexpr_void_else{void operator()()const{}};
+
+template<bool B,typename F,typename G=if_constexpr_void_else>
+void if_constexpr(F f,G g={})
+{
+  std::get<B?0:1>(std::forward_as_tuple(f,g))();
+}
+
+template<bool B,typename T,typename std::enable_if<B>::type* =nullptr>
+void copy_assign_if(T& x,const T& y){x=y;}
+
+template<bool B,typename T,typename std::enable_if<!B>::type* =nullptr>
+void copy_assign_if(T&,const T&){}
+
+template<bool B,typename T,typename std::enable_if<B>::type* =nullptr>
+void move_assign_if(T& x,T& y){x=std::move(y);}
+
+template<bool B,typename T,typename std::enable_if<!B>::type* =nullptr>
+void move_assign_if(T&,T&){}
+
+template<bool B,typename T,typename std::enable_if<B>::type* =nullptr>
+void swap_if(T& x,T& y){using std::swap; swap(x,y);}
+
+template<bool B,typename T,typename std::enable_if<!B>::type* =nullptr>
+void swap_if(T&,T&){}
+
 template<
   std::size_t K,typename Subfilter,std::size_t BucketSize,typename Allocator
 >
@@ -178,20 +206,20 @@ protected:
     hs{((m+CHAR_BIT-1)/CHAR_BIT+bucket_size-1)/bucket_size},
     ar{new_array(al(),m?hs.range():0)}
   {
-    if(ar.data)std::memset(ar.data,0,space_for(hs.range()));
+    clear_bytes();
   }
 
   filter_core(const filter_core& x):
-    filter_core{x,select_on_container_copy_construction(x.al())}{}
+    filter_core{x,allocator_select_on_container_copy_construction(x.al())}{}
 
   filter_core(filter_core&& x):filter_core{std::move(x),x.al()}{}
 
   filter_core(const filter_core& x,const allocator_type& al_):
     allocator_base{empty_init,al_},
     hs{x.hs},
-    ar{new_array(al(),x.ar.data?x.hs.range():0)}
+    ar{new_array(al(),x.range())}
   {
-    if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(hs.range()));
+    copy_bytes(ar,x);
   }
 
   filter_core(filter_core&& x,const allocator_type& al_):
@@ -203,9 +231,9 @@ protected:
       ar=x.ar;
     }
     else{
-      ar=new_array(al(),x.ar.data?x.hs.range():0);
-      if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(hs.range()));
-      delete_array(x.al(),x.ar,x.hs.range());
+      ar=new_array(al(),x.range());
+      copy_bytes(ar,x);
+      x.delete_array();
     }
     x.hs=hash_strategy{0};
     x.ar=empty_ar;
@@ -213,12 +241,68 @@ protected:
 
   ~filter_core()
   {
-    delete_array(al(),ar,hs.range());
+    delete_array();
+  }
+
+  filter_core& operator=(const filter_core& x)
+  {
+    static constexpr auto pocca=
+      allocator_propagate_on_container_copy_assignment_t<allocator_type>::
+        value;
+
+    if(this!=&x){
+      if_constexpr<pocca>([&,this]{
+        if(al()!=x.al()||range()!=x.range()){
+          auto x_al=x.al();
+          auto new_ar=new_array(x_al,x.range());
+          delete_array();
+          ar=new_ar;
+        }
+        copy_assign_if<pocca>(al(),x.al());
+      },[&,this]{ /* else */
+        if(range()!=x.range()){
+          auto new_ar=new_array(al(),x.range());
+          delete_array();
+          ar=new_ar;
+        }
+      });
+      copy_bytes(ar,x);
+      hs=x.hs;
+    }
+    return *this;
+  }
+
+  filter_core& operator=(filter_core&& x)
+  {
+    static constexpr auto pocma=
+      allocator_propagate_on_container_move_assignment_t<allocator_type>::
+        value;
+
+    if(this!=&x){
+      auto empty_ar=new_array(x.al(),0); /* relying on this not throwing */
+      if(pocma||al()==x.al()){
+        ar=x.ar;
+        move_assign_if<pocma>(al(),x.al());
+      }
+      else{
+        if(range()!=x.range()){
+          auto new_ar=new_array(al(),x.range());
+          delete_array();
+          ar=new_ar;
+        }
+        copy_bytes(ar,x);
+        x.delete_array();
+      }
+      hs=x.hs;
+      x.hs=hash_strategy{0};
+      x.ar=empty_ar;
+    }
+    return *this;
   }
 
   std::size_t capacity()const noexcept
   {
-    return ar.data!=nullptr?hs.range()*CHAR_BIT:0;
+    return range()*CHAR_BIT;
   }
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
@@ -262,14 +346,15 @@ protected:
 private:
   using allocator_base=empty_value<Allocator,0>;
 
+  const Allocator& al()const{return allocator_base::get();}
   Allocator& al(){return allocator_base::get();}
 
-  static filter_array new_array(allocator_type& al,std::size_t n)
+  static filter_array new_array(allocator_type& al,std::size_t rng)
   {
     filter_array res;
-    if(n){
-      std::size_t spc=space_for(n);
-      res.data=allocator_allocate(al,spc);
+    if(rng){
+      std::size_t n=space_for(rng);
+      res.data=allocator_allocate(al,n);
       res.buckets=buckets_for(res.data);
     }
     else{
@@ -287,17 +372,33 @@ private:
     return res;
   }
 
-  static void delete_array(allocator_type& al,const filter_array& ar,std::size_t n)
+  void delete_array()noexcept
   {
-    if(ar.data!=nullptr)allocator_deallocate(al,ar.data,space_for(n));
+    if(ar.data)allocator_deallocate(al(),ar.data,space_for(range()));
   }
 
-  static constexpr std::size_t space_for(std::size_t rng)
+  void clear_bytes()noexcept
+  {
+    if(ar.data)std::memset(ar.data,0,space_for(range()));
+  }
+
+  static void copy_bytes(filter_array& ar,const filter_core& x)
+  {
+    BOOST_ASSERT(ar.data?x.ar.data:!x.ar.data);
+    if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(x.range()));
+  }
+
+  std::size_t range()const noexcept
+  {
+    return ar.data!=nullptr?hs.range():0;
+  }
+
+  static constexpr std::size_t space_for(std::size_t rng) noexcept
   {
     return (initial_alignment-1)+rng*bucket_size+tail_size;
   }
 
-  static unsigned char* buckets_for(unsigned char* p)
+  static unsigned char* buckets_for(unsigned char* p) noexcept
   {
     return p+
       (boost::uintptr_t(initial_alignment)-
@@ -332,14 +433,14 @@ private:
 
   BOOST_FORCEINLINE void set(
     unsigned char* p,boost::uint64_t hash,
-    std::true_type /* blocks aligned */)const
+    std::true_type /* blocks aligned */)
   {
     subfilter::mark(*reinterpret_cast<block_type*>(p),hash);
   }
 
   BOOST_FORCEINLINE void set(
     unsigned char* p,boost::uint64_t hash,
-    std::false_type /* blocks not aligned */)const
+    std::false_type /* blocks not aligned */)
   {
     block_type x;
     std::memcpy(&x,p,used_block_size);
@@ -347,7 +448,8 @@ private:
     std::memcpy(p,&x,used_block_size);
   }
 
-  BOOST_FORCEINLINE unsigned char* next_element(boost::uint64_t& h)
+  BOOST_FORCEINLINE 
+  unsigned char* next_element(boost::uint64_t& h)noexcept
   {
     auto p=ar.buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
@@ -356,7 +458,8 @@ private:
     return p;
   }
 
-  BOOST_FORCEINLINE const unsigned char* next_element(boost::uint64_t& h)const
+  BOOST_FORCEINLINE
+  const unsigned char* next_element(boost::uint64_t& h)const noexcept
   {
     auto p=ar.buckets+hs.next_position(h)*bucket_size;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
