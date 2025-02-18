@@ -13,11 +13,14 @@
 
 #include <boost/bloom/block.hpp>
 #include <boost/bloom/detail/core.hpp>
+#include <boost/bloom/detail/is_nothrow_swappable.hpp>
 #include <boost/config.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/unordered/hash_traits.hpp> // TODO: internalize?
+#include <initializer_list>
+#include <utility>
 
 namespace boost{
 namespace bloom{
@@ -70,7 +73,7 @@ __declspec(empty_bases) /* activate EBO with multiple inheritance */
 #endif
 
 filter:
-  public detail::filter_core<K,Subfilter,BucketSize,Allocator>, //TODO: revert to private
+  detail::filter_core<K,Subfilter,BucketSize,Allocator>,
   empty_value<Hash,0>
 {
   using super=detail::filter_core<K,Subfilter,BucketSize,Allocator>;
@@ -84,6 +87,7 @@ filter:
 public:
   using value_type=T;
   using super::k;
+  using hasher=Hash;
   using subfilter=typename super::subfilter;
   using allocator_type=typename super::allocator_type;
   using size_type=typename super::size_type;
@@ -93,13 +97,105 @@ public:
   using pointer=typename super::pointer;
   using const_pointer=typename super::const_pointer;
 
-  filter(std::size_t m,const allocator_type& al={}):super{m,al}{}
+  filter()=default;
 
+  explicit filter(
+    std::size_t m,const hasher& h=hasher(),
+    const allocator_type& al=allocator_type()):
+    super{m,al},hash_base{empty_init,h}{}
+
+  template<typename InputIterator>
+  filter(
+    InputIterator first,InputIterator last,
+    std::size_t m,const hasher& h=hasher(),
+    const allocator_type& al=allocator_type()):
+    filter{m,h,al}
+  {
+    while(first!=last)insert(*first++);
+  }
+
+  filter(const filter&)=default;
+  filter(filter&&)=default;
+
+  template<typename InputIterator>
+  filter(
+    InputIterator first,InputIterator last,
+    std::size_t m,const allocator_type& al=allocator_type()):
+    filter{first,last,m,hasher(),al}{}
+
+  explicit filter(const allocator_type& al):filter{0,al}{}
+
+  filter(const filter& x,const allocator_type& al):
+    super{x,al},hash_base{x.h()}{}
+
+  filter(filter&& x,const allocator_type& al):
+    super{std::move(x),al},hash_base{std::move(x.h())}{}
+
+  filter(
+    std::initializer_list<value_type> il,
+    std::size_t m,const hasher& h=hasher(),
+    const allocator_type& al=allocator_type()):
+    filter{il.begin(),il.last,m,h,al}{}
+
+  filter(std::size_t m,const allocator_type& al):
+    filter{m,hasher(),al}{}
+
+  filter(
+    std::initializer_list<value_type> il,
+    std::size_t m,const allocator_type& al=allocator_type()):
+    filter{il.begin(),il.last,m,hasher(),al}{}
+
+  filter& operator=(const filter& x)
+  {
+    BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
+    using std::swap;
+
+    auto x_h=x.h();
+    super::operator=(x);
+    swap(h(),x_h);
+    return *this;
+  }
+
+  filter& operator=(filter&& x)
+  {
+    BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
+    using std::swap;
+
+    auto x_h=x.h();
+    super::operator=(std::move(x));
+    swap(h(),x_h);
+    return *this;
+  }
+
+  filter& operator=(std::initializer_list<value_type> il)
+  {
+    clear();
+    for(const auto& x:il)insert(x);
+  }
+
+  using super::get_allocator;
   using super::capacity;
 
   BOOST_FORCEINLINE void insert(const T& x)
   {
     super::insert(hash_for(x));
+  }
+
+  void swap(filter& x)
+  {
+    BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
+    using std::swap;
+
+    super::swap(x);
+    swap(h(),x.h());
+  }
+
+  using super::clear;
+  using super::reset;
+
+  hasher hash_function()const
+  {
+    return h();
   }
 
   BOOST_FORCEINLINE bool may_contain(const T& x)const
@@ -111,6 +207,7 @@ private:
   using hash_base=empty_value<Hash,0>;
 
   const Hash& h()const{return hash_base::get();}
+  Hash& h(){return hash_base::get();}
 
   inline boost::uint64_t hash_for(const T& x)const
   {

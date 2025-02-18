@@ -8,8 +8,8 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
-#define BOOST_BLOOM_FILTER_DETAIL_CORE_HPP
+#ifndef BOOST_BLOOM_DETAIL_CORE_HPP
+#define BOOST_BLOOM_DETAIL_CORE_HPP
 
 #include <boost/assert.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
@@ -125,10 +125,6 @@ inline constexpr std::size_t gcd_pow2(std::size_t x,std::size_t p)
   return (x&(0-x))<p?(x&(0-x)):p;
 }
 
-/* used for construction of a dummy array with all bits set to 1 */
-
-struct full_byte{unsigned char x=0xFF;};
-
 struct filter_array
 {
   unsigned char* data;
@@ -201,6 +197,8 @@ protected:
   using pointer=unsigned char*;
   using const_pointer=const unsigned char*;
 
+  explicit filter_core(std::size_t m=0):filter_core{m,allocator_type{}}{}
+
   filter_core(std::size_t m,const allocator_type& al_):
     allocator_base{empty_init,al_},
     hs{((m+CHAR_BIT-1)/CHAR_BIT+bucket_size-1)/bucket_size},
@@ -211,7 +209,6 @@ protected:
 
   filter_core(const filter_core& x):
     filter_core{x,allocator_select_on_container_copy_construction(x.al())}{}
-
   filter_core(filter_core&& x):filter_core{std::move(x),x.al()}{}
 
   filter_core(const filter_core& x,const allocator_type& al_):
@@ -219,7 +216,7 @@ protected:
     hs{x.hs},
     ar{new_array(al(),x.range())}
   {
-    copy_bytes(ar,x);
+    copy_bytes(x);
   }
 
   filter_core(filter_core&& x,const allocator_type& al_):
@@ -232,7 +229,7 @@ protected:
     }
     else{
       ar=new_array(al(),x.range());
-      copy_bytes(ar,x);
+      copy_bytes(x);
       x.delete_array();
     }
     x.hs=hash_strategy{0};
@@ -256,18 +253,20 @@ protected:
           auto x_al=x.al();
           auto new_ar=new_array(x_al,x.range());
           delete_array();
+          hs=x.hs;
           ar=new_ar;
         }
         copy_assign_if<pocca>(al(),x.al());
-      },[&,this]{ /* else */
+      },
+      [&,this]{ /* else */
         if(range()!=x.range()){
           auto new_ar=new_array(al(),x.range());
           delete_array();
+          hs=x.hs;
           ar=new_ar;
         }
       });
-      copy_bytes(ar,x);
-      hs=x.hs;
+      copy_bytes(x);
     }
     return *this;
   }
@@ -281,23 +280,30 @@ protected:
     if(this!=&x){
       auto empty_ar=new_array(x.al(),0); /* relying on this not throwing */
       if(pocma||al()==x.al()){
-        ar=x.ar;
+        delete_array();
         move_assign_if<pocma>(al(),x.al());
+        hs=x.hs;
+        ar=x.ar;
       }
       else{
         if(range()!=x.range()){
           auto new_ar=new_array(al(),x.range());
           delete_array();
+          hs=x.hs;
           ar=new_ar;
         }
-        copy_bytes(ar,x);
+        copy_bytes(x);
         x.delete_array();
       }
-      hs=x.hs;
       x.hs=hash_strategy{0};
       x.ar=empty_ar;
     }
     return *this;
+  }
+
+  allocator_type get_allocator()const noexcept
+  {
+    return al();
   }
 
   std::size_t capacity()const noexcept
@@ -314,11 +320,44 @@ protected:
        * of the function because prefetch completion wait gives us free CPU
        * cycles to spare.
        */
-
       if(BOOST_UNLIKELY(n==k-1&&ar.data==nullptr))return;
 
       set(p,hash);
     }
+  }
+
+  void swap(filter_core& x)
+  {
+    static constexpr auto pocs=
+      allocator_propagate_on_container_swap_t<allocator_type>::value;
+
+    if_constexpr<pocs>([&,this]{
+      swap_if<pocs>(al(),x.al());
+    },
+    [&,this]{ /* else */
+      BOOST_ASSERT(al()==x.al());
+      (void)this; /* makes sure captured this is used */
+    });
+    std::swap(hs,x.hs);
+    std::swap(ar,x.ar);
+  }
+
+  void clear()noexcept
+  {
+    clear_bytes();
+  }
+
+  void reset(std::size_t m=0)
+  {
+    hash_strategy new_hs{m};
+    std::size_t   rng=m?new_hs.range():0;
+    if(rng!=range()){
+      auto new_ar=new_array(al(),rng);
+      delete_array();
+      hs=new_hs;
+      ar=new_ar;
+    }
+    clear_bytes();
   }
 
   BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
@@ -351,25 +390,23 @@ private:
 
   static filter_array new_array(allocator_type& al,std::size_t rng)
   {
-    filter_array res;
     if(rng){
-      std::size_t n=space_for(rng);
-      res.data=allocator_allocate(al,n);
-      res.buckets=buckets_for(res.data);
+      auto p=allocator_allocate(al,space_for(rng));
+      return {p,buckets_for(p)};
     }
     else{
       /* To avoid dynamic allocation for zero capacity or moved-from filters,
-       * we point buckets to a statically allocated dummy array. This is
-       * good for read operations but not so for write operations, where
-       * we need to resort to a null check on data.
+       * we point buckets to a statically allocated dummy array with all bits
+       * set to one. This is good for read operations but not so for write
+       * operations, where we need to resort to a null check on
+       * filter_array::data.
        */
 
-      static full_byte dummy[space_for(hash_strategy{0}.range())];
+      static struct {unsigned char x=-1;}
+      dummy[space_for(hash_strategy{0}.range())];
 
-      res.data=nullptr; 
-      res.buckets=buckets_for(reinterpret_cast<unsigned char*>(&dummy));
+      return {nullptr,buckets_for(reinterpret_cast<unsigned char*>(&dummy))};
     }
-    return res;
   }
 
   void delete_array()noexcept
@@ -382,15 +419,15 @@ private:
     if(ar.data)std::memset(ar.data,0,space_for(range()));
   }
 
-  static void copy_bytes(filter_array& ar,const filter_core& x)
+  void copy_bytes(const filter_core& x)
   {
-    BOOST_ASSERT(ar.data?x.ar.data:!x.ar.data);
+    BOOST_ASSERT(range()==x.range());
     if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(x.range()));
   }
 
   std::size_t range()const noexcept
   {
-    return ar.data!=nullptr?hs.range():0;
+    return ar.data?hs.range():0;
   }
 
   static constexpr std::size_t space_for(std::size_t rng) noexcept
