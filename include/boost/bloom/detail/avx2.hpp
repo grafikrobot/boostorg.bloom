@@ -6,8 +6,8 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_FILTER_DETAIL_AVX2_HPP
-#define BOOST_BLOOM_FILTER_DETAIL_AVX2_HPP
+#ifndef BOOST_BLOOM_DETAIL_AVX2_HPP
+#define BOOST_BLOOM_DETAIL_AVX2_HPP
 
 #if defined(__AVX2__)
 #define BOOST_BLOOM_AVX2

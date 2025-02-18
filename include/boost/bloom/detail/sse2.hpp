@@ -6,8 +6,8 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_FILTER_DETAIL_SSE2_HPP
-#define BOOST_BLOOM_FILTER_DETAIL_SSE2_HPP
+#ifndef BOOST_BLOOM_DETAIL_SSE2_HPP
+#define BOOST_BLOOM_DETAIL_SSE2_HPP
 
 #if defined(__SSE2__)|| \
     defined(_M_X64)||(defined(_M_IX86_FP)&&_M_IX86_FP>=2)

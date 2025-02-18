@@ -6,8 +6,8 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_BLOCK_BASE_HPP
-#define BOOST_BLOOM_BLOCK_BASE_HPP
+#ifndef BOOST_BLOOM_DETAIL_BLOCK_BASE_HPP
+#define BOOST_BLOOM_DETAIL_BLOCK_BASE_HPP
 
 #include <boost/config.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
