@@ -56,16 +56,16 @@ namespace detail{
 #endif
 
 /*  mcg_and_fastrange produces (pos,hash') from hash, where
- *   - x=mulx(hash,range), mulx denotes extended multiplication
+ *   - x=mulx64(hash,range), mulx64 denotes extended multiplication
  *   - pos=high(x)
  *   - hash'=low(x)
  *  pos is uniformly distributed in [0,range) (see
  *  https://arxiv.org/pdf/1805.10941), whereas hash'<-hash is a multiplicative
- *  congruential generator of the form hash'<-hash*rng mod 2^n, where n is the
- *  size in bits of std::size_t. This MCG generates long cycles when the
- *  initial value of hash is odd and rng = +-3 (mod 8), which is why we adjust
- *  hash and rng as seen below. As a result, the low bits of hash' are of poor
- *  quality, and the least significant bit in particular is always one.
+ *  congruential generator of the form hash'<-hash*rng mod 2^64. This MCG
+ *  generates long cycles when the initial value of hash is odd and
+ *  rng = +-3 (mod 8), which is why we adjust hash and rng as seen below. As a
+ *  result, the low bits of hash' are of poor quality, and the least
+ *  significant bit in particular is always one.
  */
 
 struct mcg_and_fastrange
