@@ -167,7 +167,7 @@ class filter_core:empty_value<Allocator,0>
     std::is_same<allocator_value_type_t<Allocator>,unsigned char>::value,
     "Allocator value_type must be unsigned char");
 
-public:
+protected:
   static constexpr std::size_t k=K;
   using subfilter=Subfilter;
 
@@ -208,7 +208,10 @@ protected:
 
   filter_core(const filter_core& x):
     filter_core{x,allocator_select_on_container_copy_construction(x.al())}{}
-  filter_core(filter_core&& x):filter_core{std::move(x),x.al()}{}
+
+  filter_core(filter_core&& x)
+    noexcept(std::is_nothrow_move_constructible<allocator_type>::value):
+    filter_core{std::move(x),x.al()}{}
 
   filter_core(const filter_core& x,const allocator_type& al_):
     allocator_base{empty_init,al_},
@@ -235,7 +238,7 @@ protected:
     x.ar=empty_ar;
   }
 
-  ~filter_core()
+  ~filter_core()noexcept
   {
     delete_array();
   }
@@ -270,7 +273,9 @@ protected:
     return *this;
   }
 
-  filter_core& operator=(filter_core&& x)
+  filter_core& operator=(filter_core&& x)noexcept(
+    allocator_propagate_on_container_move_assignment_t<allocator_type>::value||
+    allocator_is_always_equal_t<allocator_type>::value)
   {
     static constexpr auto pocma=
       allocator_propagate_on_container_move_assignment_t<allocator_type>::
@@ -325,7 +330,9 @@ protected:
     }
   }
 
-  void swap(filter_core& x)
+  void swap(filter_core& x)noexcept(
+    allocator_propagate_on_container_swap_t<allocator_type>::value||
+    allocator_is_always_equal_t<allocator_type>::value)
   {
     static constexpr auto pocs=
       allocator_propagate_on_container_swap_t<allocator_type>::value;
@@ -359,6 +366,26 @@ protected:
     clear_bytes();
   }
 
+  bool merge_and(const filter_core& x)noexcept
+  {
+    if(range()!=x.range())return false;
+    auto first0=ar.buckets,
+         last0=first0+range()*bucket_size,
+         first1=x.ar.buckets;
+    while(first0!=last0)*first0++&=*first1++;
+    return true;
+  }
+
+  bool merge_or(const filter_core& x)noexcept
+  {
+    if(range()!=x.range())return false;
+    auto first0=ar.buckets,
+         last0=first0+range()*bucket_size,
+         first1=x.ar.buckets;
+    while(first0!=last0)*first0++|=*first1++;
+    return true;
+  }
+
   BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
   {
     hs.prepare_hash(hash);
@@ -379,6 +406,13 @@ protected:
     }
     return true;
 #endif
+  }
+
+  friend bool operator==(const filter_core& x,const filter_core& y)
+  {
+    if(x.range()!=y.range())return false;
+    else if(!x.ar.data)return true;
+    else return std::memcmp(x.ar.buckets,y.ar.buckets,x.range())==0;
   }
 
 private:
@@ -415,13 +449,13 @@ private:
 
   void clear_bytes()noexcept
   {
-    if(ar.data)std::memset(ar.data,0,space_for(range()));
+    std::memset(ar.buckets,0,range()*bucket_size);
   }
 
   void copy_bytes(const filter_core& x)
   {
     BOOST_ASSERT(range()==x.range());
-    if(ar.data)std::memcpy(ar.data,x.ar.data,space_for(x.range()));
+    std::memcpy(ar.buckets,x.ar.buckets,range()*bucket_size);
   }
 
   std::size_t range()const noexcept

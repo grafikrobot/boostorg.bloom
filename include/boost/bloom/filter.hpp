@@ -157,6 +157,7 @@ public:
   }
 
   filter& operator=(filter&& x)
+    noexcept(noexcept(std::declval<super&>()==(std::declval<super&&>())))
   {
     BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
     using std::swap;
@@ -171,6 +172,7 @@ public:
   {
     clear();
     for(const auto& x:il)insert(x);
+    return *this;
   }
 
   using super::get_allocator;
@@ -182,6 +184,7 @@ public:
   }
 
   void swap(filter& x)
+    noexcept(noexcept(std::declval<super&>().swap(std::declval<super&>())))
   {
     BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
     using std::swap;
@@ -192,6 +195,16 @@ public:
 
   using super::clear;
   using super::reset;
+
+  bool merge_and(const filter& x)noexcept
+  {
+    return super::merge_and(x);
+  }
+
+  bool merge_or(const filter& x)noexcept
+  {
+    return super::merge_or(x);
+  }
 
   hasher hash_function()const
   {
@@ -204,6 +217,13 @@ public:
   }
 
 private:
+  template<
+    typename T1,typename H,std::size_t K1,typename S,std::size_t B,typename A
+  >
+  bool friend operator==(
+    const filter<T1,H,K1,S,B,A>& x,const filter<T1,H,K1,S,B,A>& y);
+
+
   using hash_base=empty_value<Hash,0>;
 
   const Hash& h()const{return hash_base::get();}
@@ -214,6 +234,32 @@ private:
     return mix_policy::mix(h(),x);
   }
 };
+
+template<
+  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A
+>
+bool operator==(const filter<T,H,K,S,B,A>& x,const filter<T,H,K,S,B,A>& y)
+{
+  using super=typename filter<T,H,K,S,B,A>::super;
+  return static_cast<const super&>(x)==static_cast<const super&>(y);
+}
+
+template<
+  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A
+>
+bool operator!=(const filter<T,H,K,S,B,A>& x,const filter<T,H,K,S,B,A>& y)
+{
+  return !(x==y);
+}
+
+template<
+  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A
+>
+void swap(filter<T,H,K,S,B,A>& x,filter<T,H,K,S,B,A>& y)
+  noexcept(noexcept(x.swap(y)))
+{
+  x.swap(y);
+}
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop) /* C4714 */
