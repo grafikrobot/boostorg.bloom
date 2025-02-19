@@ -186,8 +186,7 @@ private:
       alignof(block_type)>cacheline?alignof(block_type):cacheline:
       1;
   static constexpr std::size_t prefetched_cachelines=
-    1+(used_block_size+cacheline-1-
-       detail::gcd_pow2(bucket_size,cacheline))/cacheline;
+    1+(used_block_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
   using hash_strategy=detail::mcg_and_fastrange;
 
 protected:
@@ -201,7 +200,7 @@ protected:
 
   filter_core(std::size_t m,const allocator_type& al_):
     allocator_base{empty_init,al_},
-    hs{((m+CHAR_BIT-1)/CHAR_BIT+bucket_size-1)/bucket_size},
+    hs{(m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT)},
     ar{new_array(al(),m?hs.range():0)}
   {
     clear_bytes();
