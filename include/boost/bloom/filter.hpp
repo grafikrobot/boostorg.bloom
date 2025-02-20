@@ -162,9 +162,8 @@ public:
     BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
     using std::swap;
 
-    auto x_h=x.h();
     super::operator=(std::move(x));
-    swap(h(),x_h);
+    swap(h(),x.h());
     return *this;
   }
 
