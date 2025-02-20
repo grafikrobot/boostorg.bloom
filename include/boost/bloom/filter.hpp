@@ -196,14 +196,16 @@ public:
   using super::clear;
   using super::reset;
 
-  bool merge_and(const filter& x)noexcept
+  filter& operator&=(const filter& x)
   {
-    return super::merge_and(x);
+    super::operator&=(x);
+    return *this;
   }
 
-  bool merge_or(const filter& x)noexcept
+  filter& operator|=(const filter& x)
   {
-    return super::merge_or(x);
+    super::operator|=(x);
+    return *this;
   }
 
   hasher hash_function()const
@@ -222,7 +224,6 @@ private:
   >
   bool friend operator==(
     const filter<T1,H,K1,S,B,A>& x,const filter<T1,H,K1,S,B,A>& y);
-
 
   using hash_base=empty_value<Hash,0>;
 

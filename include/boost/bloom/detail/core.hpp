@@ -19,8 +19,10 @@
 #include <boost/core/empty_value.hpp>
 #include <boost/core/allocator_traits.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/throw_exception.hpp>
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -366,24 +368,16 @@ protected:
     clear_bytes();
   }
 
-  bool merge_and(const filter_core& x)noexcept
+  filter_core& operator&=(const filter_core& x)
   {
-    if(range()!=x.range())return false;
-    auto first0=ar.buckets,
-         last0=first0+range()*bucket_size,
-         first1=x.ar.buckets;
-    while(first0!=last0)*first0++&=*first1++;
-    return true;
+    merge(x,[](unsigned char& a,unsigned char b){a&=b;});
+    return *this;
   }
 
-  bool merge_or(const filter_core& x)noexcept
+  filter_core& operator|=(const filter_core& x)
   {
-    if(range()!=x.range())return false;
-    auto first0=ar.buckets,
-         last0=first0+range()*bucket_size,
-         first1=x.ar.buckets;
-    while(first0!=last0)*first0++|=*first1++;
-    return true;
+    merge(x,[](unsigned char& a,unsigned char b){a|=b;});
+    return *this;
   }
 
   BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
@@ -536,6 +530,18 @@ private:
       BOOST_BLOOM_PREFETCH((unsigned char*)p+i*cacheline);
     }
     return p;
+  }
+
+  template<typename F>
+  void merge(const filter_core& x,F f)
+  {
+    if(range()!=x.range()){
+      BOOST_THROW_EXCEPTION(std::invalid_argument("incompatible filters"));
+    }
+    auto first0=ar.buckets,
+         last0=first0+range()*bucket_size,
+         first1=x.ar.buckets;
+    while(first0!=last0)f(*first0++,*first1++);
   }
 
   hash_strategy hs;
