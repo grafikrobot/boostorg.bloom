@@ -211,9 +211,8 @@ protected:
   filter_core(const filter_core& x):
     filter_core{x,allocator_select_on_container_copy_construction(x.al())}{}
 
-  filter_core(filter_core&& x)
-    noexcept(std::is_nothrow_move_constructible<allocator_type>::value):
-    filter_core{std::move(x),x.al()}{}
+  filter_core(filter_core&& x)noexcept:
+    filter_core{std::move(x),allocator_type(std::move(x.al()))}{}
 
   filter_core(const filter_core& x,const allocator_type& al_):
     allocator_base{empty_init,al_},
