@@ -203,7 +203,7 @@ protected:
   filter_core(std::size_t m,const allocator_type& al_):
     allocator_base{empty_init,al_},
     hs{(m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT)},
-    ar{new_array(al(),m?hs.range():0)}
+    ar(new_array(al(),m?hs.range():0))
   {
     clear_bytes();
   }
@@ -217,7 +217,7 @@ protected:
   filter_core(const filter_core& x,const allocator_type& al_):
     allocator_base{empty_init,al_},
     hs{x.hs},
-    ar{new_array(al(),x.range())}
+    ar(new_array(al(),x.range()))
   {
     copy_bytes(x);
   }
