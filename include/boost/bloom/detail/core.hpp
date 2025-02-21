@@ -168,7 +168,7 @@ class filter_core:empty_value<Allocator,0>
     std::is_same<allocator_value_type_t<Allocator>,unsigned char>::value,
     "Allocator value_type must be unsigned char");
 
-protected:
+public:
   static constexpr std::size_t k=K;
   using subfilter=Subfilter;
 
@@ -190,7 +190,7 @@ private:
     1+(used_block_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
   using hash_strategy=detail::mcg_and_fastrange;
 
-protected:
+public:
   using allocator_type=Allocator;
   using size_type=std::size_t;
   using difference_type=std::ptrdiff_t;
@@ -273,6 +273,11 @@ protected:
     return *this;
   }
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4127) /* conditional expression is constant */
+#endif
+
   filter_core& operator=(filter_core&& x)noexcept(
     allocator_propagate_on_container_move_assignment_t<allocator_type>::value||
     allocator_is_always_equal_t<allocator_type>::value)
@@ -304,6 +309,10 @@ protected:
     }
     return *this;
   }
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop) /* C4127 */
+#endif
 
   allocator_type get_allocator()const noexcept
   {
