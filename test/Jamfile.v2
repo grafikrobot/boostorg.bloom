@@ -16,6 +16,8 @@ project
       # <library>/boost/bloom//bloom
       [ requires cxx11_noexcept ] # used as a proxy for C++11 support
       <toolset>msvc:<cxxflags>-D_SCL_SECURE_NO_WARNINGS
+	  <toolset>gcc:<cxxflags>-march=native
+	  <toolset>clang:<cxxflags>-march=native
     ;
 
 test-suite "bloom" :
