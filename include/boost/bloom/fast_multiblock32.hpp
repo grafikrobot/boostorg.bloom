@@ -17,8 +17,6 @@
 #include <boost/cstdint.hpp>
 #include <cstddef>
 
-#error AVX2 selected
-
 namespace boost{
 namespace bloom{
 
