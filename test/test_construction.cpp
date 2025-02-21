@@ -225,7 +225,6 @@ void test_construction()
 
     filter f3(1000,hasher{42},allocator_type{2025});
     insert(f3,input);
-    auto p3=f3.get_allocator().last_allocation;
     filter f4(std::move(f3),allocator_type{2025});
     BOOST_TEST_EQ(f3.capacity(),0);
     BOOST_TEST_EQ(f3.hash_function().state,-1);
