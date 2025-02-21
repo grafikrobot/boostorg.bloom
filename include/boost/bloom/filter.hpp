@@ -120,30 +120,30 @@ public:
   template<typename InputIterator>
   filter(
     InputIterator first,InputIterator last,
-    std::size_t m,const allocator_type& al=allocator_type()):
+    std::size_t m,const allocator_type& al):
     filter{first,last,m,hasher(),al}{}
 
   explicit filter(const allocator_type& al):filter{0,al}{}
 
   filter(const filter& x,const allocator_type& al):
-    super{x,al},hash_base{x.h()}{}
+    super{x,al},hash_base{empty_init,x.h()}{}
 
   filter(filter&& x,const allocator_type& al):
-    super{std::move(x),al},hash_base{std::move(x.h())}{}
+    super{std::move(x),al},hash_base{empty_init,std::move(x.h())}{}
 
   filter(
     std::initializer_list<value_type> il,
     std::size_t m,const hasher& h=hasher(),
     const allocator_type& al=allocator_type()):
-    filter{il.begin(),il.last,m,h,al}{}
+    filter{il.begin(),il.end(),m,h,al}{}
 
   filter(std::size_t m,const allocator_type& al):
     filter{m,hasher(),al}{}
 
   filter(
     std::initializer_list<value_type> il,
-    std::size_t m,const allocator_type& al=allocator_type()):
-    filter{il.begin(),il.last,m,hasher(),al}{}
+    std::size_t m,const allocator_type& al):
+    filter{il.begin(),il.end(),m,hasher(),al}{}
 
   filter& operator=(const filter& x)
   {

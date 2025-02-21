@@ -313,7 +313,7 @@ protected:
 
   std::size_t capacity()const noexcept
   {
-    return range()*CHAR_BIT;
+    return used_array_size()*CHAR_BIT;
   }
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
@@ -442,13 +442,13 @@ private:
 
   void clear_bytes()noexcept
   {
-    std::memset(ar.buckets,0,range()*bucket_size);
+    std::memset(ar.buckets,0,used_array_size());
   }
 
   void copy_bytes(const filter_core& x)
   {
     BOOST_ASSERT(range()==x.range());
-    std::memcpy(ar.buckets,x.ar.buckets,range()*bucket_size);
+    std::memcpy(ar.buckets,x.ar.buckets,used_array_size());
   }
 
   std::size_t range()const noexcept
@@ -456,16 +456,21 @@ private:
     return ar.data?hs.range():0;
   }
 
-  static constexpr std::size_t space_for(std::size_t rng) noexcept
+  static constexpr std::size_t space_for(std::size_t rng)noexcept
   {
     return (initial_alignment-1)+rng*bucket_size+tail_size;
   }
 
-  static unsigned char* buckets_for(unsigned char* p) noexcept
+  static unsigned char* buckets_for(unsigned char* p)noexcept
   {
     return p+
       (boost::uintptr_t(initial_alignment)-
        boost::uintptr_t(p))%initial_alignment;
+  }
+
+  std::size_t used_array_size()const noexcept
+  {
+    return range()?range()*bucket_size+(used_block_size-bucket_size):0;
   }
 
   BOOST_FORCEINLINE bool get(const unsigned char* p,boost::uint64_t hash)const
@@ -538,7 +543,7 @@ private:
       BOOST_THROW_EXCEPTION(std::invalid_argument("incompatible filters"));
     }
     auto first0=ar.buckets,
-         last0=first0+range()*bucket_size,
+         last0=first0+used_array_size(),
          first1=x.ar.buckets;
     while(first0!=last0)f(*first0++,*first1++);
   }
