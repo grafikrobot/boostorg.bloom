@@ -15,7 +15,6 @@
 #include <boost/bloom/detail/mulx64.hpp>
 #include <boost/bloom/detail/sse2.hpp>
 #include <boost/config.hpp>
-#include <boost/core/bit.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/core/allocator_traits.hpp>
 #include <boost/cstdint.hpp>

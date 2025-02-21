@@ -10,8 +10,8 @@
 #define BOOST_BLOOM_DETAIL_BLOCK_BASE_HPP
 
 #include <boost/config.hpp>
+#include <boost/bloom/detail/constexpr_bit_width.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
-#include <boost/core/bit.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
 
@@ -33,7 +33,7 @@ struct block_base
   static constexpr std::size_t hash_width=sizeof(boost::uint64_t)*CHAR_BIT;
   static constexpr std::size_t block_width=sizeof(Block)*CHAR_BIT;
   static constexpr std::size_t mask=block_width-1;
-  static constexpr std::size_t shift=boost::core::bit_width(mask);
+  static constexpr std::size_t shift=constexpr_bit_width(mask);
   static constexpr std::size_t rehash_k=(hash_width-shift)/shift;
 
   template<typename F>
