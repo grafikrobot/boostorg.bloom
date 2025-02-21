@@ -22,7 +22,7 @@ struct stateful:Functor
   stateful(int state_=0):state{state_}{}
   stateful(const stateful&)=default;
   stateful(stateful&& x)noexcept:
-    Functor{std::move(x)},state{x.state}{x.state=-1;}
+    Functor(std::move(x)),state{x.state}{x.state=-1;}
 
   stateful& operator=(stateful&& x)noexcept
   {
