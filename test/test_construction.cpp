@@ -137,8 +137,6 @@ void test_pocxx()
   ValueFactory            fac;
   for(int i=0;i<10;++i)input.push_back(fac());
 
-  std::initializer_list<value_type> il={input[0],input[1],input[2],input[3]};
-
   {
     filter f1(input.begin(),input.end(),1000,hasher{42},allocator_type{2025});
     filter f2(allocator_type{1492});
