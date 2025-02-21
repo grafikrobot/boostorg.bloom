@@ -15,7 +15,7 @@ namespace boost{
 namespace bloom{
 namespace detail{
 
-/* boost::core::bit_width is not always C+11 constexpr */
+/* boost::core::bit_width is not always C++11 constexpr */
 
 inline constexpr std::size_t constexpr_bit_width(std::size_t x) 
 {
