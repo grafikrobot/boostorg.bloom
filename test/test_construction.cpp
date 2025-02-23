@@ -105,12 +105,6 @@ template<typename Filter,typename Allocator>
 using realloc_filter=typename realloc_filter_impl<Filter,Allocator>::type;
 
 template<typename Filter,typename Input>
-void insert(Filter& f,const Input& input)
-{
-  for(const auto& x:input)f.insert(x);
-}
-
-template<typename Filter,typename Input>
 void check_may_contain(const Filter& f,const Input& input)
 {
   std::size_t res=0;
@@ -258,7 +252,7 @@ void test_construction()
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
-    insert(f1,input);
+    f1.insert(input.begin(),input.end());
     filter f2(f1);
     BOOST_TEST_GE(f1.capacity(),1000);
     BOOST_TEST_EQ(f1.hash_function().state,42);
@@ -270,7 +264,7 @@ void test_construction()
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
-    insert(f1,input);
+    f1.insert(input.begin(),input.end());
     auto p1=f1.get_allocator().last_allocation;
     filter f2(std::move(f1));
     BOOST_TEST_EQ(f1.capacity(),0);
@@ -296,7 +290,7 @@ void test_construction()
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
-    insert(f1,input);
+    f1.insert(input.begin(),input.end());
     filter f2(f1,allocator_type{1492});
     BOOST_TEST_GE(f1.capacity(),1000);
     BOOST_TEST_EQ(f1.hash_function().state,42);
@@ -309,7 +303,7 @@ void test_construction()
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
-    insert(f1,input);
+    f1.insert(input.begin(),input.end());
     auto p1=f1.get_allocator().last_allocation;
     filter f2(std::move(f1),allocator_type{1492});
     BOOST_TEST_EQ(f1.capacity(),0);
@@ -323,7 +317,7 @@ void test_construction()
     check_may_contain(f2,input);
 
     filter f3(1000,hasher{42},allocator_type{2025});
-    insert(f3,input);
+    f3.insert(input.begin(),input.end());
     filter f4(std::move(f3),allocator_type{2025});
     BOOST_TEST_EQ(f3.capacity(),0);
     BOOST_TEST_EQ(f3.hash_function().state,-1);

@@ -111,7 +111,7 @@ public:
     const allocator_type& al=allocator_type()):
     filter{m,h,al}
   {
-    while(first!=last)insert(*first++);
+    insert(first,last);
   }
 
   filter(const filter&)=default;
@@ -180,6 +180,12 @@ public:
   BOOST_FORCEINLINE void insert(const T& x)
   {
     super::insert(hash_for(x));
+  }
+
+  template<typename InputIterator>
+  void insert(InputIterator first,InputIterator last)
+  {
+    while(first!=last)insert(*first++);
   }
 
   void swap(filter& x)
