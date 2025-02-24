@@ -316,8 +316,8 @@ private:
   const Hash& h()const{return hash_base::get();}
   Hash& h(){return hash_base::get();}
 
-  template<typename K>
-  inline boost::uint64_t hash_for(const K& x)const
+  template<typename U>
+  inline boost::uint64_t hash_for(const U& x)const
   {
     return mix_policy::mix(h(),x);
   }
