@@ -334,9 +334,7 @@ void test_construction()
     check_may_contain(f,partial_input);
     f=il;
     check_may_contain(f,il);
-    std::size_t tn=0;
-    for(const auto& x:partial_input)tn+=f.may_contain(x);
-    BOOST_TEST_LT(tn,partial_input.size()); /* should be 0 with high prob. */
+    check_may_not_contain(f,partial_input);
   }
 }
 

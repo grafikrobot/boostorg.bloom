@@ -87,5 +87,24 @@ void check_may_contain(const Filter& f,const Input& input)
   BOOST_TEST_EQ(res,input.size());
 }
 
+template<typename Filter,typename Input>
+void check_may_not_contain(const Filter& f,const Input& input)
+{
+  std::size_t res=0;
+  for(const auto& x:input)res+=f.may_contain(x);
+  BOOST_TEST_LT(res,input.size()); /* should be 0 with high prob. */
+}
+
+template<typename Exception,typename F>
+void check_throw(F f)
+{
+  try{
+    (void)f();
+    BOOST_TEST(false);
+  }
+  catch(const Exception&){}
+  catch(...){BOOST_TEST(false);}
+}
+
 } /* namespace test_utilities */
 #endif
