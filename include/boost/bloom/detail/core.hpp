@@ -178,6 +178,8 @@ private:
     detail::used_block_size<subfilter>::value;
   static constexpr std::size_t bucket_size=
     BucketSize?BucketSize:used_block_size;
+  static_assert(
+    bucket_size<=used_block_size,"BucketSize can't exceed the block size");
   static constexpr std::size_t tail_size=sizeof(block_type)-bucket_size;
   static constexpr bool are_blocks_aligned=
     (bucket_size%alignof(block_type)==0);
@@ -201,7 +203,7 @@ public:
 
   filter_core(std::size_t m,const allocator_type& al_):
     allocator_base{empty_init,al_},
-    hs{(m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT)},
+    hs{requested_range(m)},
     ar(new_array(al(),m?hs.range():0))
   {
     clear_bytes();
@@ -377,13 +379,13 @@ public:
 
   filter_core& operator&=(const filter_core& x)
   {
-    merge(x,[](unsigned char& a,unsigned char b){a&=b;});
+    combine(x,[](unsigned char& a,unsigned char b){a&=b;});
     return *this;
   }
 
   filter_core& operator|=(const filter_core& x)
   {
-    merge(x,[](unsigned char& a,unsigned char b){a|=b;});
+    combine(x,[](unsigned char& a,unsigned char b){a|=b;});
     return *this;
   }
 
@@ -421,6 +423,15 @@ private:
 
   const Allocator& al()const{return allocator_base::get();}
   Allocator& al(){return allocator_base::get();}
+
+  static std::size_t requested_range(std::size_t m)
+  {
+    if(m>(used_block_size-bucket_size)*CHAR_BIT){
+      /* ensures filter{f.capacity()}.capacity()==f.capacity() */
+      m-=(used_block_size-bucket_size)*CHAR_BIT;
+    }
+    return (m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT);
+  }
 
   static filter_array new_array(allocator_type& al,std::size_t rng)
   {
@@ -545,7 +556,7 @@ private:
   }
 
   template<typename F>
-  void merge(const filter_core& x,F f)
+  void combine(const filter_core& x,F f)
   {
     if(range()!=x.range()){
       BOOST_THROW_EXCEPTION(std::invalid_argument("incompatible filters"));

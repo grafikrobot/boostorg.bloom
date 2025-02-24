@@ -85,7 +85,7 @@ private:
   };
   
   uninitialized_value u;
-  Allocator          al;
+  Allocator           al;
 };
 
 } /* namespace detail */
