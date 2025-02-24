@@ -6,7 +6,6 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#include <boost/core/lightweight_test.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <new>
 #include <utility>
@@ -52,13 +51,14 @@ struct stateful_allocator
   stateful_allocator(int state_=0):state{state_}{}
 
   template<typename U>
-  stateful_allocator(const stateful_allocator<U>& x):
+  stateful_allocator(const stateful_allocator<U,Propagate,AlwaysEqual>& x):
     state{x.state},last_allocation{x.last_allocation}{}
 
   T* allocate(std::size_t n)
   {
-    last_allocation=static_cast<T*>(::operator new(n*sizeof(T)));
-    return last_allocation;
+    auto p=static_cast<T*>(::operator new(n*sizeof(T)));
+    last_allocation=p;
+    return p;
   }
 
   void deallocate(T* p,std::size_t){::operator delete(p);}
@@ -70,47 +70,9 @@ struct stateful_allocator
 
   bool operator!=(const stateful_allocator& x)const{return !(*this==x);}
 
-  int state;
-  T*  last_allocation=nullptr;
+  int   state;
+  void* last_allocation=nullptr;
 };
-
-template<typename Filter,typename Hash>
-struct rehash_filter_impl;
-
-template<
-  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A,
-  typename Hash
->
-struct rehash_filter_impl<boost::bloom::filter<T,H,K,S,B,A>,Hash>
-{
-  using type=boost::bloom::filter<T,Hash,K,S,B,A>;
-};
-
-template<typename Filter,typename Hash>
-using rehash_filter=typename rehash_filter_impl<Filter,Hash>::type;
-
-template<typename Filter,typename Allocator>
-struct realloc_filter_impl;
-
-template<
-  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A,
-  typename Allocator
->
-struct realloc_filter_impl<boost::bloom::filter<T,H,K,S,B,A>,Allocator>
-{
-  using type=boost::bloom::filter<T,H,K,S,B,Allocator>;
-};
-
-template<typename Filter,typename Allocator>
-using realloc_filter=typename realloc_filter_impl<Filter,Allocator>::type;
-
-template<typename Filter,typename Input>
-void check_may_contain(const Filter& f,const Input& input)
-{
-  std::size_t res=0;
-  for(const auto& x:input)res+=f.may_contain(x);
-  BOOST_TEST_EQ(res,input.size());
-}
 
 template<
   typename Filter,typename ValueFactory,typename Propagate,typename AlwaysEqual
@@ -121,7 +83,7 @@ void test_pocxx()
   static constexpr auto always_equal=AlwaysEqual::value;
   using filter=realloc_filter<
     rehash_filter<Filter,stateful<typename Filter::hasher>>,
-    stateful_allocator<unsigned char,Propagate,AlwaysEqual>
+    stateful_allocator<typename Filter::value_type,Propagate,AlwaysEqual>
   >;
   using value_type=typename filter::value_type;
   using hasher=typename filter::hasher;
@@ -193,7 +155,7 @@ void test_construction()
 {
   using filter=realloc_filter<
     rehash_filter<Filter,stateful<typename Filter::hasher>>,
-    stateful_allocator<unsigned char>
+    stateful_allocator<typename Filter::value_type>
   >;
   using value_type=typename filter::value_type;
   using hasher=typename filter::hasher;

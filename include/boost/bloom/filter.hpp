@@ -13,13 +13,16 @@
 
 #include <boost/bloom/block.hpp>
 #include <boost/bloom/detail/core.hpp>
-#include <boost/bloom/detail/is_nothrow_swappable.hpp>
+#include <boost/bloom/detail/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/container_hash/hash.hpp>
+#include <boost/core/allocator_traits.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/unordered/hash_traits.hpp> // TODO: internalize?
 #include <initializer_list>
+#include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace boost{
@@ -54,6 +57,37 @@ struct mulx64_mix_policy
   }
 };
 
+
+template<typename Allocator,typename T>
+class allocator_constructed
+{
+public:
+  template<typename...Args>
+  allocator_constructed(const Allocator& al_,Args&&... args):al{al_}
+  {
+    allocator_construct(al,std::addressof(u.x),std::forward<Args>(args)...);
+  }
+
+  ~allocator_constructed()
+  {
+    allocator_destroy(al,std::addressof(u.x));
+  }
+
+  const T& value()const noexcept{return u.x;}
+
+private:
+  union uninitialized_value
+  {
+    uninitialized_value(){}
+    ~uninitialized_value(){}
+
+    T x;
+  };
+  
+  uninitialized_value u;
+  Allocator          al;
+};
+
 } /* namespace detail */
 
 #if defined(BOOST_MSVC)
@@ -64,7 +98,7 @@ struct mulx64_mix_policy
 template<
   typename T,typename Hash,std::size_t K,
   typename Subfilter=block<unsigned char,1>,std::size_t BucketSize=0,
-  typename Allocator=std::allocator<unsigned char>
+  typename Allocator=std::allocator<T>
 >
 class
 
@@ -73,10 +107,18 @@ __declspec(empty_bases) /* activate EBO with multiple inheritance */
 #endif
 
 filter:
-  detail::filter_core<K,Subfilter,BucketSize,Allocator>,
+  detail::filter_core<
+    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
+  >,
   empty_value<Hash,0>
 {
-  using super=detail::filter_core<K,Subfilter,BucketSize,Allocator>;
+  BOOST_BLOOM_STATIC_ASSERT_IS_CV_UNQUALIFIED_OBJECT(T);
+  static_assert(
+    std::is_same<T,allocator_value_type_t<Allocator>>::value,
+    "Allocator's value_type must be T");
+  using super=detail::filter_core<
+    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
+  >;
   using mix_policy=typename std::conditional<
     unordered::hash_is_avalanching<Hash>::value&&
     sizeof(std::size_t)>=sizeof(boost::uint64_t),
@@ -89,13 +131,13 @@ public:
   using super::k;
   using hasher=Hash;
   using subfilter=typename super::subfilter;
-  using allocator_type=typename super::allocator_type;
+  using allocator_type=Allocator;
   using size_type=typename super::size_type;
   using difference_type=typename super::difference_type;
   using reference=value_type&;
   using const_reference=const value_type&;
-  using pointer=typename super::pointer;
-  using const_pointer=typename super::const_pointer;
+  using pointer=value_type*;
+  using const_pointer=const value_type*;
 
   filter()=default;
 
@@ -170,14 +212,39 @@ public:
   filter& operator=(std::initializer_list<value_type> il)
   {
     clear();
-    for(const auto& x:il)insert(x);
+    insert(il);
     return *this;
   }
 
   using super::get_allocator;
   using super::capacity;
 
+  template<typename... Args>
+  BOOST_FORCEINLINE void emplace(Args&&... args)
+  {
+    insert(detail::allocator_constructed<allocator_type,value_type>{
+      get_allocator(),std::forward<Args>(args)...}.value());
+  }
+
+  template<
+    typename U,
+    std::enable_if<std::is_same<T,detail::remove_cvref_t<U>>::value>* =nullptr
+  >
+  BOOST_FORCEINLINE void emplace(U&& x)
+  {
+    insert(x); /* avoid value_type construction */
+  }
+
   BOOST_FORCEINLINE void insert(const T& x)
+  {
+    super::insert(hash_for(x));
+  }
+
+  template<
+    typename K,
+    typename H=hasher,detail::enable_if_transparent_t<H>* =nullptr
+  >
+  BOOST_FORCEINLINE void insert(const K& x)
   {
     super::insert(hash_for(x));
   }
@@ -185,7 +252,12 @@ public:
   template<typename InputIterator>
   void insert(InputIterator first,InputIterator last)
   {
-    while(first!=last)insert(*first++);
+    while(first!=last)emplace(*first++);
+  }
+
+  void insert(std::initializer_list<value_type> il)
+  {
+    insert(il.begin(),il.end());
   }
 
   void swap(filter& x)
@@ -223,6 +295,15 @@ public:
     return super::may_contain(hash_for(x));
   }
 
+  template<
+    typename K,
+    typename H=hasher,detail::enable_if_transparent_t<H>* =nullptr
+  >
+  BOOST_FORCEINLINE bool may_contain(const K& x)const
+  {
+    return super::may_contain(hash_for(x));
+  }
+
 private:
   template<
     typename T1,typename H,std::size_t K1,typename S,std::size_t B,typename A
@@ -235,7 +316,8 @@ private:
   const Hash& h()const{return hash_base::get();}
   Hash& h(){return hash_base::get();}
 
-  inline boost::uint64_t hash_for(const T& x)const
+  template<typename K>
+  inline boost::uint64_t hash_for(const K& x)const
   {
     return mix_policy::mix(h(),x);
   }
