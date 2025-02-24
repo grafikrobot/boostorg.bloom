@@ -228,7 +228,8 @@ public:
 
   template<
     typename U,
-    std::enable_if<std::is_same<T,detail::remove_cvref_t<U>>::value>* =nullptr
+    typename std::enable_if<
+      std::is_same<T,detail::remove_cvref_t<U>>::value>::type* =nullptr
   >
   BOOST_FORCEINLINE void emplace(U&& x)
   {

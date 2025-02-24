@@ -46,8 +46,8 @@ void test_insertion()
   >;
   using value_type=typename filter::value_type;
 
-  filter                    f(10000);
-  ValueFactory              fac;
+  filter       f(10000);
+  ValueFactory fac;
 
   {
     auto x=fac();
@@ -58,6 +58,11 @@ void test_insertion()
     auto x=fac();
     f.emplace(value_type{x,0,"boost"}); /* must avoid value_type move ctor */
     BOOST_TEST(f.may_contain(value_type{x,1}));
+  }
+  {
+    value_type x{fac(),0,"boost"};
+    f.emplace(x); /* same with copy ctor */
+    BOOST_TEST(f.may_contain(x));
   }
   {
     value_type x{fac(),0};
