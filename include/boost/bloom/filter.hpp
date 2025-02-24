@@ -241,10 +241,10 @@ public:
   }
 
   template<
-    typename K,
+    typename U,
     typename H=hasher,detail::enable_if_transparent_t<H>* =nullptr
   >
-  BOOST_FORCEINLINE void insert(const K& x)
+  BOOST_FORCEINLINE void insert(const U& x)
   {
     super::insert(hash_for(x));
   }
@@ -296,10 +296,10 @@ public:
   }
 
   template<
-    typename K,
+    typename U,
     typename H=hasher,detail::enable_if_transparent_t<H>* =nullptr
   >
-  BOOST_FORCEINLINE bool may_contain(const K& x)const
+  BOOST_FORCEINLINE bool may_contain(const U& x)const
   {
     return super::may_contain(hash_for(x));
   }
