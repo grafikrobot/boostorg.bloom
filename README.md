@@ -48,7 +48,7 @@ that marks one or more of its bits according to some associated strategy.
 template<
   typename T, typename Hash, std::size_t K,
   typename Subfilter = block<unsigned char, 1>, std::size_t BucketSize = 0,
-  typename Allocator = std::allocator<unsigned char>  
+  typename Allocator = std::allocator<T>  
 >
 class filter;
 ```
