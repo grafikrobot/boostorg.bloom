@@ -415,7 +415,7 @@ public:
   {
     if(x.range()!=y.range())return false;
     else if(!x.ar.data)return true;
-    else return std::memcmp(x.ar.buckets,y.ar.buckets,x.range())==0;
+    else return std::memcmp(x.ar.buckets,y.ar.buckets,x.used_array_size())==0;
   }
 
 private:
