@@ -61,7 +61,11 @@ struct stateful_allocator
     return p;
   }
 
-  void deallocate(T* p,std::size_t){::operator delete(p);}
+  void deallocate(T* p,std::size_t)
+  {
+    ::operator delete(p);
+    last_allocation=nullptr; /* avoids spurious use-after-free warnings */
+  }
 
   bool operator==(const stateful_allocator& x)const
   {
