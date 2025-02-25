@@ -427,7 +427,7 @@ private:
   static std::size_t requested_range(std::size_t m)
   {
     if(m>(used_block_size-bucket_size)*CHAR_BIT){
-      /* ensures filter{f.capacity()}.capacity()==f.capacity() */
+      /* ensures filter_core{f.capacity()}.capacity()==f.capacity() */
       m-=(used_block_size-bucket_size)*CHAR_BIT;
     }
     return (m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT);
