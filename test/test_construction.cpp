@@ -376,7 +376,7 @@ struct constructing_allocator
 
   T* allocate(std::size_t n)
   {
-     return static_cast<T*>(::operator new(n*sizeof(T)));
+    return static_cast<T*>(::operator new(n*sizeof(T)));
   }
 
   void deallocate(T* p,std::size_t){::operator delete(p);}

@@ -366,7 +366,7 @@ public:
 
   void reset(std::size_t m=0)
   {
-    hash_strategy new_hs{m};
+    hash_strategy new_hs{requested_range(m)};
     std::size_t   rng=m?new_hs.range():0;
     if(rng!=range()){
       auto new_ar=new_array(al(),rng);
