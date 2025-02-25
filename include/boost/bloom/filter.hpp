@@ -57,7 +57,6 @@ struct mulx64_mix_policy
   }
 };
 
-
 template<typename Allocator,typename T>
 class allocator_constructed
 {
