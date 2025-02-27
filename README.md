@@ -15,7 +15,7 @@ filters, and more.
 int main()
 {
   // Bloom filter of strings with 5 bits set per insertion
-  using filter = boost::bloom::filter<std::string, boost::hash<std::string>, 5>;
+  using filter = boost::bloom::filter<std::string, 5>;
 
   // create filter with a capacity of 1'000'000 **bits**
   filter f(1'000'000);
@@ -46,15 +46,14 @@ that marks one or more of its bits according to some associated strategy.
 
 ```cpp
 template<
-  typename T, typename Hash, std::size_t K,
+  typename T, std::size_t K,
   typename Subfilter = block<unsigned char, 1>, std::size_t BucketSize = 0,
-  typename Allocator = std::allocator<T>  
+  typename Hash = boost::hash<T>, typename Allocator = std::allocator<T>  
 >
 class filter;
 ```
 
 * `T`: type of the elements inserted.
-* `Hash`: a hash function for `T`.
 * `K` number of buckets marked per insertion.
 * `Subfilter`: type of subfilter used (more on this later).
 * `BucketSize`: the number of buckets is just the capacity of the underlying
@@ -79,9 +78,9 @@ which may result in more cache misses.
 
 Sets `K'` bits in an underlying value of the unsigned integral type `Block`
 (e.g. `unsigned char`, `uint32_t`, `uint64_t`). So,
-a `filter<T, Hash, K, block<Block, K'>>` will set `K*K'` bits per element.
+a `filter<T, K, block<Block, K'>>` will set `K*K'` bits per element.
 The tradeoff here is that insertion/lookup will be (much) faster than
-with `filter<T, Hash, K*K'>` while the FPR will be worse (larger).
+with `filter<T, K*K'>` while the FPR will be worse (larger).
 FPR is better the wider `Block` is.
 
 ### `multiblock<Block, K'>`
@@ -115,7 +114,7 @@ $$k_{\text{opt}}=c\cdot\ln2,$$
 
 yielding a minimum attainable FPR of $$1/2^{k_{\text{opt}}} \approx 0.6185^{c}$$.
 
-In the case of a Boost.Bloom block filter of the form `filter<T, Hash, K, block<Block, K'>>`, we can extend
+In the case of a Boost.Bloom block filter of the form `filter<T, K, block<Block, K'>>`, we can extend
 the approach from [Putze et al.](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f376ff09a64b388bfcde2f5353e9ddb44033aac8)
 to derive the (approximate but very precise) formula:
 
@@ -148,11 +147,11 @@ We don't know of any closed, simple formula for the FPR of block and multiblock 
 but empirical calculations show that $$FPR/FPR_\text{baseline}$$ improves (reduces) with smaller values of `BucketSize`
 and larger values of $$k$$, $$k'$$ and $$c=m/n$$. Some examples:
 
-* `filter<T, Hash, 1, multiblock<unsigned char, 9>, BucketSize>`:
+* `filter<T, 1, multiblock<unsigned char, 9>, BucketSize>`:
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.65$$
-* `filter<T, Hash, 1, multiblock<uint32_t, 9>, BucketSize>`: 
+* `filter<T, 1, multiblock<uint32_t, 9>, BucketSize>`: 
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.80$$
-* `filter<T, Hash, 1, multiblock<uint64_t, 9>, BucketSize>`: 
+* `filter<T, 1, multiblock<uint64_t, 9>, BucketSize>`: 
 $$\frac{FPR(c=12,\texttt{BucketSize}=1)}{FPR(c=12,\texttt{BucketSize}=0)}=0.87$$
 
 (Remember that `BucketSize` = 0 selects the non-overlapping case.)
@@ -164,7 +163,7 @@ All benchmarks run on a Windows 10 machine with 8GB RAM and an Intel Core i5-826
 release mode (see [benchmarking code](benchmark/comparison_table.cpp)).
 
 The tables show the FPR and execution times in nanoseconds per operation 
-for six different configurations of `boost::bloom::filter<int, boost::hash<int>, ...>`
+for six different configurations of `boost::bloom::filter<int, ...>`
 where `N` elements have been inserted. Filters are constructed with a capacity
 `c*N` (bits), so `c` is the number of bits used per element. For each combination of `c` and
 a given filter configuration, the optimum value of `K` (that yielding the minimum FPR)
