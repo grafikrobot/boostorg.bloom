@@ -198,7 +198,7 @@ public:
   }
 
   filter& operator=(filter&& x)
-    noexcept(noexcept(std::declval<super&>()==(std::declval<super&&>())))
+    noexcept(noexcept(std::declval<super&>()=(std::declval<super&&>())))
   {
     BOOST_BLOOM_STATIC_ASSERT_IS_NOTHROW_SWAPPABLE(Hash);
     using std::swap;
