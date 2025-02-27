@@ -96,25 +96,8 @@ private:
   static BOOST_FORCEINLINE bool check_m256i(
     const __m256i& x,boost::uint64_t hash,std::size_t kp)
   {
-    if(kp==8){
-      __m256i h=make_m256i(hash,8);
-      return _mm256_testc_si256(x,h);
-    }
-    else{
-      const __m256i masks[7]={
-        _mm256_set_epi32(-1,-1,-1,-1,-1,-1,-1, 0),
-        _mm256_set_epi32(-1,-1,-1,-1,-1,-1, 0, 0),
-        _mm256_set_epi32(-1,-1,-1,-1,-1, 0, 0, 0),
-        _mm256_set_epi32(-1,-1,-1,-1, 0, 0, 0, 0),
-        _mm256_set_epi32(-1,-1,-1, 0, 0, 0, 0, 0),
-        _mm256_set_epi32(-1,-1, 0, 0, 0, 0, 0, 0),
-        _mm256_set_epi32(-1, 0, 0, 0, 0, 0, 0, 0)
-      };
-
-      __m256i h=make_m256i(hash,kp);
-      __m256i y=_mm256_or_si256(masks[kp-1],x);
-      return _mm256_testc_si256(y,h);
-    }
+    __m256i h=make_m256i(hash,kp);
+    return _mm256_testc_si256(x,h);
   }
 };
 
