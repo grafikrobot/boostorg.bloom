@@ -31,13 +31,13 @@ void test_combination()
            f1_copy{f1},
            f2{input2.begin(),input2.end(),f1.capacity()+1};
 
-    check_throw<std::invalid_argument>([&]{f1&=filter{};});
+    BOOST_TEST_THROWS(f1&=filter{},std::invalid_argument);
     BOOST_TEST(f1==f1_copy);
-    check_throw<std::invalid_argument>([&]{f1&=f2;});
+    BOOST_TEST_THROWS(f1&=f2,std::invalid_argument);
     BOOST_TEST(f1==f1_copy);
-    check_throw<std::invalid_argument>([&]{f1|=filter{};});
+    BOOST_TEST_THROWS(f1|=filter{},std::invalid_argument);
     BOOST_TEST(f1==f1_copy);
-    check_throw<std::invalid_argument>([&]{f1|=f2;});
+    BOOST_TEST_THROWS(f1|=f2;,std::invalid_argument);
     BOOST_TEST(f1==f1_copy);
   }
   {

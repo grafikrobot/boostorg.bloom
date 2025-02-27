@@ -95,16 +95,5 @@ void check_may_not_contain(const Filter& f,const Input& input)
   BOOST_TEST_LT(res,input.size()); /* should be 0 with high prob. */
 }
 
-template<typename Exception,typename F>
-void check_throw(F f)
-{
-  try{
-    (void)f();
-    BOOST_TEST(false);
-  }
-  catch(const Exception&){}
-  catch(...){BOOST_TEST(false);}
-}
-
 } /* namespace test_utilities */
 #endif
