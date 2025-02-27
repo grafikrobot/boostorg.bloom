@@ -393,9 +393,8 @@ void test_allocator_aware_construction()
 {
   using value_type=allocator_only_constructible;
   using filter=boost::bloom::filter<
-    value_type,allocator_only_constructible_hash,
-    5,boost::bloom::block<unsigned char,1>,0,
-    constructing_allocator<value_type>
+    value_type,5,boost::bloom::block<unsigned char,1>,0,
+    allocator_only_constructible_hash,constructing_allocator<value_type>
   >;
 
   filter f(1000);

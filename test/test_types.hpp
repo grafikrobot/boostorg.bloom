@@ -21,19 +21,16 @@
 
 using test_types=boost::mp11::mp_list<
   boost::bloom::filter<
-    int,boost::hash<int>,2
+    int,2
   >,
   boost::bloom::filter<
-    std::string,boost::hash<std::string>,1,
-    boost::bloom::block<boost::uint16_t,3>,1
+   std::string,1,boost::bloom::block<boost::uint16_t,3>,1
   >,
   boost::bloom::filter<
-    std::size_t,boost::hash<std::size_t>,1,
-    boost::bloom::multiblock<boost::uint64_t,3>
+    std::size_t,1,boost::bloom::multiblock<boost::uint64_t,3>
   >,
   boost::bloom::filter<
-    unsigned char,boost::hash<unsigned char>,1,
-    boost::bloom::fast_multiblock32<5>,2
+    unsigned char,1,boost::bloom::fast_multiblock32<5>,2
   >
 >;
 

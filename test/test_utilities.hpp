@@ -37,12 +37,12 @@ template<typename Filter,typename U>
 struct revalue_filter_impl;
 
 template<
-  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A,
+  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A,
   typename U
 >
-struct revalue_filter_impl<boost::bloom::filter<T,H,K,S,B,A>,U>
+struct revalue_filter_impl<boost::bloom::filter<T,K,S,B,H,A>,U>
 {
-  using type=boost::bloom::filter<U,H,K,S,B,boost::allocator_rebind_t<A,U>>;
+  using type=boost::bloom::filter<U,K,S,B,H,boost::allocator_rebind_t<A,U>>;
 };
 
 template<typename Filter,typename U>
@@ -52,12 +52,12 @@ template<typename Filter,typename Hash>
 struct rehash_filter_impl;
 
 template<
-  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A,
+  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A,
   typename Hash
 >
-struct rehash_filter_impl<boost::bloom::filter<T,H,K,S,B,A>,Hash>
+struct rehash_filter_impl<boost::bloom::filter<T,K,S,B,H,A>,Hash>
 {
-  using type=boost::bloom::filter<T,Hash,K,S,B,A>;
+  using type=boost::bloom::filter<T,K,S,B,Hash,A>;
 };
 
 template<typename Filter,typename Hash>
@@ -67,12 +67,12 @@ template<typename Filter,typename Allocator>
 struct realloc_filter_impl;
 
 template<
-  typename T,typename H,std::size_t K,typename S,std::size_t B,typename A,
+  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A,
   typename Allocator
 >
-struct realloc_filter_impl<boost::bloom::filter<T,H,K,S,B,A>,Allocator>
+struct realloc_filter_impl<boost::bloom::filter<T,K,S,B,H,A>,Allocator>
 {
-  using type=boost::bloom::filter<T,H,K,S,B,Allocator>;
+  using type=boost::bloom::filter<T,K,S,B,H,Allocator>;
 };
 
 template<typename Filter,typename Allocator>

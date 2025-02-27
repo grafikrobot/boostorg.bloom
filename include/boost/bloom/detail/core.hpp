@@ -176,10 +176,14 @@ private:
   using block_type=typename subfilter::value_type;
   static constexpr std::size_t used_block_size=
     detail::used_block_size<subfilter>::value;
+
+public:
   static constexpr std::size_t bucket_size=
     BucketSize?BucketSize:used_block_size;
   static_assert(
     bucket_size<=used_block_size,"BucketSize can't exceed the block size");
+
+private:
   static constexpr std::size_t tail_size=sizeof(block_type)-bucket_size;
   static constexpr bool are_blocks_aligned=
     (bucket_size%alignof(block_type)==0);
