@@ -6,6 +6,7 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
+#include <boost/core/lightweight_test.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <new>
 #include <utility>
@@ -107,7 +108,7 @@ void test_pocxx()
     BOOST_TEST_GE(f2.capacity(),1000);
     BOOST_TEST_EQ(f2.hash_function().state,42);
     BOOST_TEST_EQ(f2.get_allocator().state,propagate?2025:1492);
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
   }
   {
     filter f1(input.begin(),input.end(),1000,hasher{42},allocator_type{2025});
@@ -130,7 +131,7 @@ void test_pocxx()
       BOOST_TEST_NE(f2.get_allocator().last_allocation,nullptr);
       BOOST_TEST_NE(f2.get_allocator().last_allocation,p1);
     }
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
   }
   if(propagate||always_equal){
     filter f1(input.begin(),input.end(),1000,hasher{42},allocator_type{2025});
@@ -200,21 +201,21 @@ void test_construction()
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,0);
     BOOST_TEST_EQ(f.get_allocator().state,0);
-    check_may_contain(f,input);
+    BOOST_TEST(may_contain(f,input));
   }
   {
     filter f(input.begin(),input.end(),1000,hasher{42});
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,42);
     BOOST_TEST_EQ(f.get_allocator().state,0);
-    check_may_contain(f,input);
+    BOOST_TEST(may_contain(f,input));
   }
   {
     filter f(input.begin(),input.end(),1000,hasher{42},allocator_type{2025});
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,42);
     BOOST_TEST_EQ(f.get_allocator().state,2025);
-    check_may_contain(f,input);
+    BOOST_TEST(may_contain(f,input));
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
@@ -226,7 +227,7 @@ void test_construction()
     BOOST_TEST_EQ(f2.capacity(),f1.capacity());
     BOOST_TEST_EQ(f2.hash_function().state,42);
     BOOST_TEST_EQ(f2.get_allocator().state,2025);
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
@@ -239,14 +240,14 @@ void test_construction()
     BOOST_TEST_EQ(f2.hash_function().state,42);
     BOOST_TEST_EQ(f2.get_allocator().state,2025);
     BOOST_TEST_EQ(f2.get_allocator().last_allocation,p1);
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
   }
   {
     filter f(input.begin(),input.end(),1000,allocator_type{2025});
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,0);
     BOOST_TEST_EQ(f.get_allocator().state,2025);
-    check_may_contain(f,input);
+    BOOST_TEST(may_contain(f,input));
   }
   {
     filter f(allocator_type{2025});
@@ -261,11 +262,11 @@ void test_construction()
     BOOST_TEST_GE(f1.capacity(),1000);
     BOOST_TEST_EQ(f1.hash_function().state,42);
     BOOST_TEST_EQ(f1.get_allocator().state,2025);
-    check_may_contain(f1,input);
+    BOOST_TEST(may_contain(f1,input));
     BOOST_TEST_EQ(f2.capacity(),f1.capacity());
     BOOST_TEST_EQ(f2.hash_function().state,42);
     BOOST_TEST_EQ(f2.get_allocator().state,1492);
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
   }
   {
     filter f1(1000,hasher{42},allocator_type{2025});
@@ -280,7 +281,7 @@ void test_construction()
     BOOST_TEST_EQ(f2.get_allocator().state,1492);
     BOOST_TEST_NE(f2.get_allocator().last_allocation,nullptr);
     BOOST_TEST_NE(f2.get_allocator().last_allocation,p1);
-    check_may_contain(f2,input);
+    BOOST_TEST(may_contain(f2,input));
 
     filter f3(1000,hasher{42},allocator_type{2025});
     f3.insert(input.begin(),input.end());
@@ -292,28 +293,28 @@ void test_construction()
     BOOST_TEST_EQ(f4.hash_function().state,42);
     BOOST_TEST_EQ(f4.get_allocator().state,2025);
     BOOST_TEST_EQ(f4.get_allocator().last_allocation,nullptr);
-    check_may_contain(f4,input);
+    BOOST_TEST(may_contain(f4,input));
   }
   {
     filter f(il,1000);
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,0);
     BOOST_TEST_EQ(f.get_allocator().state,0);
-    check_may_contain(f,il);
+    BOOST_TEST(may_contain(f,il));
   }
   {
     filter f(il,1000,hasher{42});
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,42);
     BOOST_TEST_EQ(f.get_allocator().state,0);
-    check_may_contain(f,il);
+    BOOST_TEST(may_contain(f,il));
   }
   {
     filter f(il,1000,hasher{42},allocator_type{2025});
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,42);
     BOOST_TEST_EQ(f.get_allocator().state,2025);
-    check_may_contain(f,il);
+    BOOST_TEST(may_contain(f,il));
   }
   {
     filter f(1000,allocator_type{2025});
@@ -326,7 +327,7 @@ void test_construction()
     BOOST_TEST_GE(f.capacity(),1000);
     BOOST_TEST_EQ(f.hash_function().state,0);
     BOOST_TEST_EQ(f.get_allocator().state,2025);
-    check_may_contain(f,il);
+    BOOST_TEST(may_contain(f,il));
   }
   test_pocxx<Filter,ValueFactory,std::false_type,std::false_type>();
   test_pocxx<Filter,ValueFactory,std::false_type,std::true_type >();
@@ -335,10 +336,10 @@ void test_construction()
   {
     std::vector<value_type> partial_input(input.begin()+il.size(),input.end());
     filter f(partial_input.begin(),partial_input.end(),1000);
-    check_may_contain(f,partial_input);
+    BOOST_TEST(may_contain(f,partial_input));
     f=il;
-    check_may_contain(f,il);
-    check_may_not_contain(f,partial_input);
+    BOOST_TEST(may_contain(f,il));
+    BOOST_TEST(may_not_contain(f,partial_input));
   }
 }
 

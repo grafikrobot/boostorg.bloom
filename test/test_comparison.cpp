@@ -6,6 +6,7 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
+#include <boost/core/lightweight_test.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include "test_types.hpp"
 #include "test_utilities.hpp"

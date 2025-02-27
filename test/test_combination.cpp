@@ -6,6 +6,7 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
+#include <boost/core/lightweight_test.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <vector>
 #include "test_types.hpp"
@@ -56,16 +57,16 @@ void test_combination()
 
     f1.insert(input2.begin(),input2.end());
     f1&=f2;
-    check_may_contain(f1,input2);
-    check_may_not_contain(f1,input1);
+    BOOST_TEST(may_contain(f1,input2));
+    BOOST_TEST(may_not_contain(f1,input1));
   }
   {
     filter       f1{input1.begin(),input1.end(),1000};
     const filter f2{input2.begin(),input2.end(),f1.capacity()};
 
     f1|=f2;
-    check_may_contain(f1,input1);
-    check_may_contain(f1,input2);
+    BOOST_TEST(may_contain(f1,input1));
+    BOOST_TEST(may_contain(f1,input2));
   }
 }
 

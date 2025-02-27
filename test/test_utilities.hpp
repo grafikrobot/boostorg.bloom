@@ -11,7 +11,6 @@
 
 #include <boost/bloom/filter.hpp>
 #include <boost/core/allocator_traits.hpp>
-#include <boost/core/lightweight_test.hpp>
 #include <string>
 
 namespace test_utilities{
@@ -80,19 +79,19 @@ template<typename Filter,typename Allocator>
 using realloc_filter=typename realloc_filter_impl<Filter,Allocator>::type;
 
 template<typename Filter,typename Input>
-void check_may_contain(const Filter& f,const Input& input)
+bool may_contain(const Filter& f,const Input& input)
 {
   std::size_t res=0;
   for(const auto& x:input)res+=f.may_contain(x);
-  BOOST_TEST_EQ(res,input.size());
+  return res==input.size();
 }
 
 template<typename Filter,typename Input>
-void check_may_not_contain(const Filter& f,const Input& input)
+bool may_not_contain(const Filter& f,const Input& input)
 {
   std::size_t res=0;
   for(const auto& x:input)res+=f.may_contain(x);
-  BOOST_TEST_LT(res,input.size()); /* should be 0 with high prob. */
+  return res<input.size(); /* res should be 0 with high probability */
 }
 
 } /* namespace test_utilities */
