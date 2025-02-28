@@ -72,16 +72,8 @@ private:
       _mm256_set_epi32(1,1,1,1,1,1,1,1),
     };
 
-    /* Same constants as src/kudu/util/block_bloom_filter.h in
-     * https://github.com/apache/kudu
-     */
-
-    const __m256i rehash=_mm256_set_epi64x(
-      0x47b6137b44974d91ull,0x8824ad5ba2b7289dull,
-      0x705495c72df1424bull,0x9efc49475c6bfb31ull);
-    
     __m256i h=_mm256_set1_epi64x(hash);
-    h=_mm256_mullo_epi32(rehash,h);
+    h=_mm256_sllv_epi64(h,_mm256_set_epi64x(15,10,5,0));
     h=_mm256_srli_epi32(h,32-5);
     return _mm256_sllv_epi32(ones[kp-1],h);
   }
