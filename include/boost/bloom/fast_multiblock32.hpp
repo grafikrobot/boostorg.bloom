@@ -109,6 +109,18 @@ private:
 namespace boost{
 namespace bloom{
 
+/* https://stackoverflow.com/a/54018882/213114 */
+
+#ifdef _MSC_VER
+#define BOOST_BLOOM_INIT_U32X4(w,x,y,z) \
+{((w)+(unsigned long long(x)<<32)),((y)+(unsigned long long(z)<<32))}
+#else
+#define BOOST_BLOOM_INIT_U32X4(w,x,y,z) {(w),(x),(y),(z)}
+#endif
+
+#define BOOST_BLOOM_INIT_U32X4X2(w0,x0,y0,z0,w1,x1,y1,z1) \
+{{BOOST_BLOOM_INIT_U32X4(w0,x0,y0,z0),BOOST_BLOOM_INIT_U32X4(w1,x1,y1,z1)}}
+
 template<std::size_t K>
 struct fast_multiblock32
 {
@@ -144,30 +156,23 @@ private:
     boost::uint64_t hash,std::size_t kp)
   {
     static const uint32x4x2_t ones[8]={
-      {{{1,0,0,0},{0,0,0,0}}},
-      {{{1,1,0,0},{0,0,0,0}}},
-      {{{1,1,1,0},{0,0,0,0}}},
-      {{{1,1,1,1},{0,0,0,0}}},
-      {{{1,1,1,1},{1,0,0,0}}},
-      {{{1,1,1,1},{1,1,0,0}}},
-      {{{1,1,1,1},{1,1,1,0}}},
-      {{{1,1,1,1},{1,1,1,1}}}
+      BOOST_BLOOM_INIT_U32X4X2(1,0,0,0,0,0,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,0,0,0,0,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,0,0,0,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,1,0,0,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,1,1,0,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,1,1,1,0,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,1,1,1,1,0),
+      BOOST_BLOOM_INIT_U32X4X2(1,1,1,1,1,1,1,1)
     };
-
-    /* Same constants as src/kudu/util/block_bloom_filter.h in
-     * https://github.com/apache/kudu
-     */
-
-    static const uint32x4x2_t rehash={{
-      {0x5c6bfb31,0x9efc4947,0x2df1424b,0x705495c7},
-      {0xa2b7289d,0x8824ad5b,0x44974d91,0x47b6137b}
-    }};
 
     uint32x4_t h_lo=vreinterpretq_u32_u64(vdupq_n_u64(hash)),
                h_hi=h_lo;
 
-    h_lo=vmulq_u32(h_lo,rehash.val[0]);
-    h_hi=vmulq_u32(h_hi,rehash.val[1]);
+    h_lo=vreinterpretq_u32_u64(
+      vshlq_u64(vreinterpretq_u64_u32(h_lo),(int64x2_t{0,5})));
+    h_hi=vreinterpretq_u32_u64(
+      vshlq_u64(vreinterpretq_u64_u32(h_lo),(int64x2_t{10,15})));
 
     h_lo=vshrq_n_u32(h_lo,32-5);
     h_hi=vshrq_n_u32(h_hi,32-5);
@@ -195,13 +200,13 @@ private:
     if(kp!=8){
       static const boost::uint32_t out=0xFFFFFFFFu;
       static const uint32x4x2_t masks[7]={
-        {{{ 0 ,out,out,out},{out,out,out,out}}},
-        {{{ 0 , 0 ,out,out},{out,out,out,out}}},
-        {{{ 0 , 0 , 0 ,out},{out,out,out,out}}},
-        {{{ 0 , 0 , 0 , 0 },{out,out,out,out}}},
-        {{{ 0 , 0 , 0 , 0 },{ 0 ,out,out,out}}},
-        {{{ 0 , 0 , 0 , 0 },{ 0 , 0 ,out,out}}},
-        {{{ 0 , 0 , 0 , 0 },{ 0 , 0 , 0 ,out}}}
+        BOOST_BLOOM_INIT_U32X4X2( 0 ,out,out,out,out,out,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 ,out,out,out,out,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 ,out,out,out,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 ,out,out,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 ,out,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 , 0 ,out,out),
+        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 , 0 , 0 ,out)
       };
 
       lo=vorrq_u32(lo,masks[kp-1].val[0]);
@@ -211,6 +216,9 @@ private:
     return (vgetq_lane_s64(res,0)&vgetq_lane_s64(res,1))==-1;
   }
 };
+
+#undef BOOST_BLOOM_INIT_U32X4X2
+#undef BOOST_BLOOM_INIT_U32X4
 
 } /* namespace bloom */
 } /* namespace boost */
