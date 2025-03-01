@@ -26,10 +26,12 @@ namespace bloom{
 /* https://stackoverflow.com/a/54018882/213114 */
 
 #ifdef _MSC_VER
-#define BOOST_BLOOM_INIT_U32X4(w,x,y,z) \
-{((w)+(unsigned long long(x)<<32)),((y)+(unsigned long long(z)<<32))}
+#define BOOST_BLOOM_INIT_U32X4(w,x,y,z)            \
+{(boost::uint32_t(w)+(unsigned long long(x)<<32)), \
+ (boost::uint32_t(y)+(unsigned long long(z)<<32))}
 #else
-#define BOOST_BLOOM_INIT_U32X4(w,x,y,z) {(w),(x),(y),(z)}
+#define BOOST_BLOOM_INIT_U32X4(w,x,y,z) \
+{boost::uint32_t(w),boost::uint32_t(x),boost::uint32_t(y),boost::uint32_t(z)}
 #endif
 
 #define BOOST_BLOOM_INIT_U32X4X2(w0,x0,y0,z0,w1,x1,y1,z1) \
@@ -112,15 +114,14 @@ private:
     uint32x4_t   lo=vtstq_u32(x.val[0],h.val[0]);
     uint32x4_t   hi=vtstq_u32(x.val[1],h.val[1]);
     if(kp!=8){
-      static const boost::uint32_t out=0xFFFFFFFFu;
       static const uint32x4x2_t masks[7]={
-        BOOST_BLOOM_INIT_U32X4X2( 0 ,out,out,out,out,out,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 ,out,out,out,out,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 ,out,out,out,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 ,out,out,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 ,out,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 , 0 ,out,out),
-        BOOST_BLOOM_INIT_U32X4X2( 0 , 0 , 0 , 0 , 0 , 0 , 0 ,out)
+        BOOST_BLOOM_INIT_U32X4X2( 0,-1,-1,-1,-1,-1,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0,-1,-1,-1,-1,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0, 0,-1,-1,-1,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0, 0, 0,-1,-1,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0, 0, 0, 0,-1,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0, 0, 0, 0, 0,-1,-1),
+        BOOST_BLOOM_INIT_U32X4X2( 0, 0, 0, 0, 0, 0, 0,-1)
       };
 
       lo=vorrq_u32(lo,masks[kp-1].val[0]);
