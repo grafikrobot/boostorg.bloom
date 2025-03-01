@@ -15,6 +15,10 @@
 #include <boost/cstdint.hpp>
 #include <cstddef>
 
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+
 namespace boost{
 namespace bloom{
 
