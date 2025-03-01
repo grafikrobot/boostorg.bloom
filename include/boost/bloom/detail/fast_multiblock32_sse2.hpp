@@ -30,6 +30,15 @@ struct m128ix2
   __m128i lo,hi;
 };
 
+static inline int mm_testc_si128(__m128i x,__m128i y)
+{
+#ifdef __SSE4_1__
+  return _mm_testc_si128(x,y);
+#else
+  return _mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(x,y),y))==0xFFFF;
+#endif
+}
+
 } /* namespace detail */
 
 template<std::size_t K>
@@ -110,8 +119,8 @@ private:
     const detail::m128ix2& x,boost::uint64_t hash,std::size_t kp)
   {
     detail::m128ix2 h=make_m128ix2(hash,kp);
-    auto res=_mm_testc_si128(x.lo,h.lo);
-    if(kp>4)res&=_mm_testc_si128(x.hi,h.hi);
+    auto res=detail::mm_testc_si128(x.lo,h.lo);
+    if(kp>4)res&=detail::mm_testc_si128(x.hi,h.hi);
     return res;
   }
 };
