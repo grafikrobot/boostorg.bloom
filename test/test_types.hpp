@@ -11,6 +11,7 @@
 
 #include <boost/bloom/block.hpp>
 #include <boost/bloom/fast_multiblock32.hpp>
+#include <boost/bloom/fast_multiblock64.hpp>
 #include <boost/bloom/filter.hpp>
 #include <boost/bloom/multiblock.hpp>
 #include <boost/cstdint.hpp>
@@ -31,6 +32,9 @@ using test_types=boost::mp11::mp_list<
   >,
   boost::bloom::filter<
     unsigned char,1,boost::bloom::fast_multiblock32<5>,2
+  >,
+  boost::bloom::filter<
+    int,1,boost::bloom::fast_multiblock64<11>
   >
 >;
 

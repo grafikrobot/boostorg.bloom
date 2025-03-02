@@ -6,19 +6,13 @@
  * See https://www.boost.org/libs/bloom for library home page.
  */
 
-#ifndef BOOST_BLOOM_FAST_MULTIBLOCK32_HPP
-#define BOOST_BLOOM_FAST_MULTIBLOCK32_HPP
+#ifndef BOOST_BLOOM_FAST_MULTIBLOCK64_HPP
+#define BOOST_BLOOM_FAST_MULTIBLOCK64_HPP
 
 #include <boost/bloom/detail/avx2.hpp>
-#include <boost/bloom/detail/neon.hpp>
-#include <boost/bloom/detail/sse2.hpp>
 
 #if defined(BOOST_BLOOM_AVX2)
-#include <boost/bloom/detail/fast_multiblock32_avx2.hpp>
-#elif defined(BOOST_BLOOM_SSE2) /* important that this comes after AVX2 */
-#include <boost/bloom/detail/fast_multiblock32_sse2.hpp>
-#elif defined(BOOST_BLOOM_LITTLE_ENDIAN_NEON)
-#include <boost/bloom/detail/fast_multiblock32_neon.hpp>
+#include <boost/bloom/detail/fast_multiblock64_avx2.hpp>
 #else /* fallback */
 #include <boost/bloom/multiblock.hpp>
 #include <boost/cstdint.hpp>
@@ -28,7 +22,7 @@ namespace boost{
 namespace bloom{
 
 template<std::size_t K>
-using fast_multiblock32=multiblock<boost::uint32_t,K>;
+using fast_multiblock64=multiblock<boost::uint64_t,K>;
 
 } /* namespace bloom */
 } /* namespace boost */
