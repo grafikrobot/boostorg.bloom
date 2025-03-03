@@ -175,7 +175,7 @@ a given filter configuration, the optimum value of `K` (that yielding the minimu
 has been used.
 
 For reference, we provide also insertion, successful lookup and unsuccessful lookup times
-for a `boost::unordered_flat_set<int>` with the sanme number of elements `N`.
+for a `boost::unordered_flat_set<int>` with the same number of elements `N`.
 
 ### 64-bit mode
 
