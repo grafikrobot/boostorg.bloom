@@ -174,6 +174,7 @@ public:
 
 private:
   using block_type=typename subfilter::value_type;
+  static constexpr std::size_t block_size=sizeof(block_type);
   static constexpr std::size_t used_block_size=
     detail::used_block_size<subfilter>::value;
 
@@ -193,7 +194,7 @@ private:
       alignof(block_type)>cacheline?alignof(block_type):cacheline:
       1;
   static constexpr std::size_t prefetched_cachelines=
-    1+(bucket_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
+    1+(block_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
   using hash_strategy=detail::mcg_and_fastrange;
 
 public:
@@ -513,7 +514,7 @@ private:
     std::false_type /* blocks not aligned */)const
   {
     block_type x;
-    std::memcpy(&x,p,bucket_size);
+    std::memcpy(&x,p,block_size);
     return subfilter::check(x,hash);
   }
 
@@ -534,9 +535,9 @@ private:
     std::false_type /* blocks not aligned */)
   {
     block_type x;
-    std::memcpy(&x,p,bucket_size);
+    std::memcpy(&x,p,block_size);
     subfilter::mark(x,hash);
-    std::memcpy(p,&x,bucket_size);
+    std::memcpy(p,&x,block_size);
   }
 
   BOOST_FORCEINLINE 
