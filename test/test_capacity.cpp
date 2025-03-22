@@ -8,6 +8,8 @@
 
 #include <boost/core/lightweight_test.hpp>
 #include <boost/mp11/algorithm.hpp>
+#include <cmath>
+#include <limits>
 #include <new>
 #include "test_types.hpp"
 #include "test_utilities.hpp"
@@ -28,7 +30,7 @@ struct counting_allocator
   T* allocate(std::size_t n)
   {
     ++num_allocations;
-    return static_cast<T*>(::operator new(n*sizeof(T)));
+    return static_cast<T*>(capped_new(n*sizeof(T)));
   }
 
   void deallocate(T* p,std::size_t){::operator delete(p);}
@@ -60,6 +62,11 @@ void test_capacity()
     filter f;
     BOOST_TEST_EQ(f.capacity(),0);
     BOOST_TEST_EQ(num_allocations,0);
+  }
+  {
+    BOOST_TEST_THROWS(
+      (void)filter((std::numeric_limits<std::size_t>::max)()),
+      std::bad_alloc);
   }
   {
     filter      f{{fac(),fac()},1000};
@@ -95,6 +102,14 @@ void test_capacity()
     BOOST_TEST_EQ(num_allocations,1);
     BOOST_TEST_GE(f2.capacity(),c);
     BOOST_TEST(f1==f2);
+  }
+  {
+    for(int i=0;i<=5;++i){
+      double fpr=std::pow(10,(double)-i);
+      BOOST_TEST_EQ(
+        filter::capacity_for(100,fpr),
+        filter(100,fpr).capacity());
+    }
   }
 }
 

@@ -11,6 +11,8 @@
 
 #include <boost/bloom/filter.hpp>
 #include <boost/core/allocator_traits.hpp>
+#include <limits>
+#include <new>
 #include <string>
 
 namespace test_utilities{
@@ -77,6 +79,21 @@ struct realloc_filter_impl<boost::bloom::filter<T,K,S,B,H,A>,Allocator>
 
 template<typename Filter,typename Allocator>
 using realloc_filter=typename realloc_filter_impl<Filter,Allocator>::type;
+
+void* capped_new(std::size_t n)
+{
+  using limits=std::numeric_limits<std::size_t>;
+  static constexpr std::size_t alloc_limit=
+    limits::digits>=64?
+    /* avoid AddressSanitizer: allocation-size-too-big */
+    (std::size_t)0x10000000000ull:
+    /* avoid big allocations that might succeed in 32-bit */
+    (limits::max)()/256;
+
+  if(n>alloc_limit)throw std::bad_alloc{};
+
+  return ::operator new(n);
+}
 
 template<typename Filter,typename Input>
 bool may_contain(const Filter& f,const Input& input)
