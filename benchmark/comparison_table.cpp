@@ -55,6 +55,7 @@ void resume_timing()
 
 #include <boost/bloom/block.hpp>
 #include <boost/bloom/fast_multiblock32.hpp>
+#include <boost/bloom/fast_multiblock64.hpp>
 #include <boost/bloom/filter.hpp>
 #include <boost/bloom/multiblock.hpp>
 #include <boost/core/detail/splitmix64.hpp>
@@ -211,14 +212,21 @@ template<std::size_t K1,std::size_t K2,std::size_t K3>
 using filters1=boost::mp11::mp_list<
   filter<int,K1>,
   filter<int,1,block<boost::uint64_t,K2>>,
-  filter<int,1,multiblock<boost::uint64_t,K3>>
+  filter<int,1,block<boost::uint64_t,K3>,1>
 >;
 
 template<std::size_t K1,std::size_t K2,std::size_t K3>
 using filters2=boost::mp11::mp_list<
-  filter<int,1,fast_multiblock32<K1>>,
-  filter<int,1,block<boost::uint64_t,K2>,1>,
-  filter<int,1,multiblock<boost::uint64_t,K3>,1>
+  filter<int,1,multiblock<boost::uint64_t,K1>>,
+  filter<int,1,multiblock<boost::uint64_t,K2>,1>,
+  filter<int,1,fast_multiblock32<K3>>
+>;
+
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters3=boost::mp11::mp_list<
+  filter<int,1,fast_multiblock32<K1>,1>,
+  filter<int,1,fast_multiblock64<K2>>,
+  filter<int,1,fast_multiblock64<K3>,1>
 >;
 
 int main(int argc,char* argv[])
@@ -268,7 +276,7 @@ int main(int argc,char* argv[])
     "    <th></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>,1></code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
@@ -277,17 +285,17 @@ int main(int argc,char* argv[])
     subheader<<
     "  </tr>\n";
 
-  row<filters1< 6, 4,  5>>( 8);
-  row<filters1< 9, 5,  8>>(12);
-  row<filters1<11, 6, 11>>(16);
-  row<filters1<14, 7, 14>>(20);
+  row<filters1< 6,  4,  5>>( 8);
+  row<filters1< 9,  5,  6>>(12);
+  row<filters1<11,  6,  7>>(16);
+  row<filters1<14,  7,  8>>(20);
 
   std::cout<<
     "  <tr>\n"
     "    <th></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;K,fast_multiblock32&ltK>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t, K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>></code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
@@ -296,10 +304,29 @@ int main(int argc,char* argv[])
     subheader<<
     "  </tr>\n";
 
-  row<filters2< 5, 5,  5>>( 8);
-  row<filters2< 8, 6,  8>>(12);
-  row<filters2<11, 7, 11>>(16);
-  row<filters2<14, 8, 14>>(20);
+  row<filters2< 5,  5,  5>>( 8);
+  row<filters2< 8,  8,  8>>(12);
+  row<filters2<11, 11, 11>>(16);
+  row<filters2<13, 14, 13>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>,1></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters3< 5,  5,  5>>( 8);
+  row<filters3< 8,  8,  8>>(12);
+  row<filters3<11, 11, 11>>(16);
+  row<filters3<13, 13, 14>>(20);
 
   std::cout<<"</table>\n";
 }
