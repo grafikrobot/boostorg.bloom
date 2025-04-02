@@ -60,9 +60,9 @@ namespace detail{
 #endif
 
 /*  mcg_and_fastrange produces (pos,hash') from hash, where
- *   - x=mulx64(hash,range), mulx64 denotes extended multiplication
- *   - pos=high(x)
- *   - hash'=low(x)
+ *   - m=mulx64(hash,range), mulx64 denotes extended multiplication
+ *   - pos=high(m)
+ *   - hash'=low(m)
  *  pos is uniformly distributed in [0,range) (see
  *  https://arxiv.org/pdf/1805.10941), whereas hash'<-hash is a multiplicative
  *  congruential generator of the form hash'<-hash*rng mod 2^64. This MCG
@@ -100,20 +100,20 @@ struct mcg_and_fastrange
   boost::uint64_t rng;
 };
 
-/* used_block_size<Subfilter>::value is Subfilter::used_value_size if it
+/* used_value_size<Subfilter>::value is Subfilter::used_value_size if it
  * exists, or sizeof(Subfilter::value_type) otherwise. This covers the
  * case where a subfilter only operates on the first bytes of its entire
  * value_type (e.g. fast_multiblock32<K> with K<8).
  */
 
 template<typename Subfilter,typename=void>
-struct used_block_size
+struct used_value_size
 {
   static constexpr std::size_t value=sizeof(typename Subfilter::value_type);
 };
 
 template<typename Subfilter>
-struct used_block_size<
+struct used_value_size<
   Subfilter,
   typename std::enable_if<Subfilter::used_value_size!=0>::type
 >
@@ -187,14 +187,14 @@ private:
   static constexpr std::size_t k_total=k*kp;
   using block_type=typename subfilter::value_type;
   static constexpr std::size_t block_size=sizeof(block_type);
-  static constexpr std::size_t used_block_size=
-    detail::used_block_size<subfilter>::value;
+  static constexpr std::size_t used_value_size=
+    detail::used_value_size<subfilter>::value;
 
 public:
   static constexpr std::size_t bucket_size=
-    BucketSize?BucketSize:used_block_size;
+    BucketSize?BucketSize:used_value_size;
   static_assert(
-    bucket_size<=used_block_size,"BucketSize can't exceed the block size");
+    bucket_size<=used_value_size,"BucketSize can't exceed the block size");
 
 private:
   static constexpr std::size_t tail_size=sizeof(block_type)-bucket_size;
@@ -356,7 +356,7 @@ public:
 
   static double fpr_for(std::size_t n,std::size_t m)
   {
-    return n==0?0.0:m==0?1.0:fpr_for_c((double)m/n);
+    return m==0?1.0:n==0?0.0:fpr_for_c((double)m/n);
   }
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
@@ -410,6 +410,11 @@ public:
     clear_bytes();
   }
 
+  void reset(std::size_t n,double fpr)
+  {
+    reset(capacity_for(n,fpr));
+  }
+
   filter_core& operator&=(const filter_core& x)
   {
     combine(x,[](unsigned char& a,unsigned char b){a&=b;});
@@ -459,9 +464,9 @@ private:
 
   static std::size_t requested_range(std::size_t m)
   {
-    if(m>(used_block_size-bucket_size)*CHAR_BIT){
+    if(m>(used_value_size-bucket_size)*CHAR_BIT){
       /* ensures filter_core{f.capacity()}.capacity()==f.capacity() */
-      m-=(used_block_size-bucket_size)*CHAR_BIT;
+      m-=(used_value_size-bucket_size)*CHAR_BIT;
     }
     return
       (std::numeric_limits<std::size_t>::max)()-m>=bucket_size*CHAR_BIT-1?
@@ -530,7 +535,7 @@ private:
 
   static std::size_t used_array_size(std::size_t rng)noexcept
   {
-    return rng?rng*bucket_size+(used_block_size-bucket_size):0;
+    return rng?rng*bucket_size+(used_value_size-bucket_size):0;
   }
 
   static std::size_t unadjusted_capacity_for(std::size_t n,double fpr)
@@ -539,7 +544,7 @@ private:
     using double_limits=std::numeric_limits<double>;
 
     BOOST_ASSERT(fpr>=0.0&&fpr<=1.0);
-    if(n==0)return 0;
+    if(n==0)return fpr==1.0?0:1;
 
     constexpr double eps=1.0/(double)(size_t_limits::max)();
     constexpr double max_size_t_as_double=
@@ -593,7 +598,7 @@ private:
 
   static double fpr_for_c(double c)
   {
-    constexpr std::size_t w=(2*used_block_size-bucket_size)*CHAR_BIT;
+    constexpr std::size_t w=(2*used_value_size-bucket_size)*CHAR_BIT;
     const double          lambda=w*k/c;
     const double          loglambda=std::log(lambda);
     double                res=0.0;
