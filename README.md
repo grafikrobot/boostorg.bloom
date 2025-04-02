@@ -1,5 +1,8 @@
 # Candidate Boost Bloom Library
 
+[![Branch](https://img.shields.io/badge/branch-develop-brightgreen.svg)](https://github.com/joaquintides/bloom/tree/develop) [![CI](https://github.com/joaquintides/bloom/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/joaquintides/bloom/actions/workflows/ci.yml) [![Drone status](https://img.shields.io/drone/build/joaquintides/bloom/develop?server=https%3A%2F%2Fdrone.cpp.al&logo=drone&logoColor=%23CCCCCC&label=CI)](https://drone.cpp.al/joaquintides/bloom) </br>
+[![BSL 1.0](https://img.shields.io/badge/license-BSL_1.0-blue.svg)](https://www.boost.org/users/license.html) <img alt="C++11 required" src="https://img.shields.io/badge/standard-C%2b%2b11-blue.svg"> <img alt="Header-only library" src="https://img.shields.io/badge/build-header--only-blue.svg">
+
 (Candidate) Boost.Bloom provides the class template `boost::bloom::filter` that
 can be configured to implement a classical [Bloom filter](https://en.wikipedia.org/wiki/Bloom_filter)
 as well as variations discussed in the literature such as _blocked_ filters, _split block_/_multi-block_
