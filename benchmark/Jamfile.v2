@@ -5,6 +5,14 @@
 #
 # See http://www.boost.org/libs/bloom for library home page.
 
-project : default-build release <link>static ;
+import-search /boost/config/checks ;
+
+import config : requires ;
+
+project 
+    : default-build release <link>static 
+    : requirements [ requires cxx14_generic_lambdas  ]
+    ;
 
 exe comparison_table : comparison_table.cpp ;
+exe fpr_c : fpr_c.cpp ;

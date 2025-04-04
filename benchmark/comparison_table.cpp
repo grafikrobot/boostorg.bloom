@@ -63,6 +63,7 @@ void resume_timing()
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/utility.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
