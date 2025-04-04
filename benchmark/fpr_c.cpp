@@ -73,13 +73,13 @@ std::size_t c_min=4,
             c_max=24;
 
 /* you may need to change this if optimum k >= k_max */
-std::size_t k_max=20;
+constexpr std::size_t k_max=20;
 
 using fpr_function=std::function<double(std::size_t)>;
 static std::vector<fpr_function> fprs=[]
 {
   std::vector<fpr_function> fprs;
-  using ks=boost::mp11::mp_iota_c<20,1>;
+  using ks=boost::mp11::mp_iota_c<k_max,1>;
   boost::mp11::mp_for_each<ks>([&](auto K){
     fprs.emplace_back(fpr< ::filter<K> >);
   });
@@ -99,19 +99,19 @@ int main()
     <<filter_name<<"\n"
     <<"fpr;c;k\n";
 
-  std::size_t k=0;
+  std::size_t ik=0; /* k-1 */
   for(std::size_t c=c_min;c<=c_max;++c){
-    double r=fprs[k](c);
+    double r=fprs[ik](c);
     for(;;){
-      if(k==k_max){
+      if(ik+1>=k_max){
         std::cerr<<"k_max hit, raise it and rerun\n";
         return EXIT_FAILURE;
       }
-      double rn=fprs[k+1](c);
+      double rn=fprs[ik+1](c);
       if(rn>=r)break;
       r=rn;
-      ++k;
+      ++ik;
     }
-    std::cout<<c<<";"<<r<<";"<<(k+1)<<"\n";
+    std::cout<<c<<";"<<r<<";"<<(ik+1)<<"\n";
   }
 }
