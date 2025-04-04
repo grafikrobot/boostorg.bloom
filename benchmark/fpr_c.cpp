@@ -72,7 +72,7 @@ using filter=boost::bloom::filter<int,1,multiblock<std::uint32_t,K>,1>;
 std::size_t c_min=4,
             c_max=24;
 
-/* you may need to change this if optimum k > k_max */
+/* you may need to change this if optimum k >= k_max */
 std::size_t k_max=20;
 
 using fpr_function=std::function<double(std::size_t)>;
