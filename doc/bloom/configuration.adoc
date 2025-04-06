@@ -68,7 +68,7 @@ Let's see how this can be used by way of an example. Suppose we plan to insert 1
 and want to keep the FPR at 10^-4^. The chart gives us five possibilities:
 
 * `filter<K>` -> _c_ &cong; 19 bits per element
-* `filter<1, multiblock<uint32_t, K>, 1>` -> _c_ &cong; 20 bits per element
+* `filter<1, multiblock<uint64_t, K>, 1>` -> _c_ &cong; 20 bits per element
 * `filter<1, multiblock<uint64_t, K>>` -> _c_ &cong; 21 bits per element
 * `filter<1, multiblock<uint32_t, K>, 1>` -> _c_ &cong; 21.5 bits per element
 * `filter<1, multiblock<uint32_t, K>>` -> _c_ &cong; 23 bits per element
