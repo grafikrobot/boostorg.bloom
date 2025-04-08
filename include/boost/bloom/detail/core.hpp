@@ -16,8 +16,9 @@
 #include <boost/bloom/detail/mulx64.hpp>
 #include <boost/bloom/detail/sse2.hpp>
 #include <boost/config.hpp>
-#include <boost/core/empty_value.hpp>
 #include <boost/core/allocator_traits.hpp>
+#include <boost/core/empty_value.hpp>
+#include <boost/core/span.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/throw_exception.hpp>
 #include <cmath>
@@ -357,6 +358,16 @@ public:
   static double fpr_for(std::size_t n,std::size_t m)
   {
     return m==0?1.0:n==0?0.0:fpr_for_c((double)m/n);
+  }
+
+  boost::span<unsigned char> array()noexcept
+  {
+    return {ar.data?ar.buckets:nullptr,capacity()/CHAR_BIT};
+  }
+
+  boost::span<const unsigned char> array()const noexcept
+  {
+    return {ar.data?ar.buckets:nullptr,capacity()/CHAR_BIT};
   }
 
   BOOST_FORCEINLINE void insert(boost::uint64_t hash)
