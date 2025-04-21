@@ -28,6 +28,20 @@ void test_combination()
   }
 
   {
+    filter f{0};
+    f&=f;
+    f|=f;
+  }
+  {
+    filter f{input1.begin(),input1.end(),1000},
+           f_copy{f};
+
+    f&=f;
+    BOOST_TEST(f==f_copy);
+    f|=f;
+    BOOST_TEST(f==f_copy);
+  }
+  {
     filter f1{input1.begin(),input1.end(),1000},
            f1_copy{f1},
            f2{input2.begin(),input2.end(),f1.capacity()+1};
