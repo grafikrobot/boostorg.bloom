@@ -27,11 +27,23 @@ void test_combination()
     input2.push_back(fac());
   }
 
+#if defined(__clang__)&&defined(__has_warning)
+#if __has_warning("-Wself-assign-overloaded")
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#endif
+#endif
   {
     filter f{0};
     f&=f;
     f|=f;
   }
+#if defined(__clang__)&&defined(__has_warning)
+#if __has_warning("-Wself-assign-overloaded")
+#pragma clang diagnostic pop
+#endif
+#endif
+
   {
     filter f{input1.begin(),input1.end(),1000},
            f_copy{f};
