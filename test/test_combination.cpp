@@ -72,9 +72,11 @@ void test_combination()
            f1_copy{f1},
            empty{f1.capacity()};
 
-    f1|=empty;
+    filter& rf1=(f1|=empty);
+    BOOST_TEST_EQ(&rf1,&f1);
     BOOST_TEST(f1==f1_copy);
-    f1&=empty;
+    filter& rf2=(f1&=empty);
+    BOOST_TEST_EQ(&rf2,&f1);
     BOOST_TEST(f1==empty);
   }
   {
