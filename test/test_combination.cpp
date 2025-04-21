@@ -38,12 +38,6 @@ void test_combination()
     f&=f;
     f|=f;
   }
-#if defined(__clang__)&&defined(__has_warning)
-#if __has_warning("-Wself-assign-overloaded")
-#pragma clang diagnostic pop
-#endif
-#endif
-
   {
     filter f{input1.begin(),input1.end(),1000},
            f_copy{f};
@@ -53,6 +47,12 @@ void test_combination()
     f|=f;
     BOOST_TEST(f==f_copy);
   }
+#if defined(__clang__)&&defined(__has_warning)
+#if __has_warning("-Wself-assign-overloaded")
+#pragma clang diagnostic pop
+#endif
+#endif
+
   {
     filter f1{input1.begin(),input1.end(),1000},
            f1_copy{f1},
