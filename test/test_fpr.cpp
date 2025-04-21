@@ -64,11 +64,11 @@ void test_fpr()
     boost::hash<std::string>
   >;
 
-  BOOST_TEST_GT(filter(0,0.0).capacity(),0);
-  BOOST_TEST_GT(filter(0,0.5).capacity(),0);
-  BOOST_TEST_EQ(filter(0,1.0).capacity(),0);
+  BOOST_TEST_GT(filter(0,0.0).capacity(),0u);
+  BOOST_TEST_GT(filter(0,0.5).capacity(),0u);
+  BOOST_TEST_EQ(filter(0,1.0).capacity(),0u);
   BOOST_TEST_THROWS((void)filter(1,0.0),std::bad_alloc);
-  BOOST_TEST_EQ(filter(100,1.0).capacity(),0);
+  BOOST_TEST_EQ(filter(100,1.0).capacity(),0u);
 
   {
     static constexpr int max_fpr_exp=
