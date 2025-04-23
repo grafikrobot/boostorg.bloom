@@ -11,7 +11,5 @@ project
       <cxxstd>11
     ;
 
-exe genome
-    : genome.cpp
-    : <cxxstd>17
-    ;
+exe basic : basic.cpp ;
+exe genome : genome.cpp : <cxxstd>17 ;
