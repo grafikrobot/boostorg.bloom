@@ -13,7 +13,7 @@ import config : requires ;
 
 project
     : requirements
-      # <library>/boost/bloom//bloom
+      # <library>/boost/bloom//boost_bloom
       [ requires cxx11_noexcept ] # used as a proxy for C++11 support
       <toolset>msvc:<cxxflags>-D_SCL_SECURE_NO_WARNINGS
     ;
