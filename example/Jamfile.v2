@@ -13,3 +13,4 @@ project
 
 exe basic : basic.cpp ;
 exe genome : genome.cpp : <cxxstd>17 ;
+exe serialization : serialization.cpp ;
