@@ -110,7 +110,7 @@ genome_filter make_genome_filter(const char* filename)
 
     /* don't insert km till it has km.size() nucleotides */
 
-    for(; width< km.size() -1 && i < line.size(); ++i) {
+    for(; width< km.size() - 1 && i < line.size(); ++i) {
       km += line[i];
       ++width;
     }

@@ -23,6 +23,7 @@ struct uuid_generator
 {
   boost::uuids::uuid operator()()
   {
+    std::uint8_t    data[16];
     boost::uint64_t x = rng();
     std::memcpy(&data[0], &x, sizeof(x));
     x = rng();
@@ -32,7 +33,6 @@ struct uuid_generator
   }
 
   boost::detail::splitmix64 rng;
-  std::uint8_t              data[16];
 };
 
 using filter = boost::bloom::filter<
