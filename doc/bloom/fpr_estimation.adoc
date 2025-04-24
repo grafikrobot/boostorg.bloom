@@ -63,7 +63,7 @@ We can use the following approximations ({small}stem:[s]{small-end} = `BucketSiz
 where the replacement of {small}stem:[b]{small-end} with {small}stem:[2b-s]{small-end} 
 (or {small}stem:[bk']{small-end} with {small}stem:[2bk'-s]{small-end} for multiblock filters) accounts
 for the fact that the window of hashing positions affecting a particular bit spreads due to
-overlapping. Note that the formulas reduce to the non-ovelapping case when {small}stem:[s]{small-end} takes its
+overlapping. Note that the formulas reduce to the non-overlapping case when {small}stem:[s]{small-end} takes its
 default value (stem:[b] for block, stem:[bk'] for multiblock). These approximations are acceptable for
 low values of {small}stem:[k']{small-end} but tend to underestimate the actual FPR as {small}stem:[k']{small-end} grows.
 In general, the use of overlapping improves (decreases) FPR by a factor ranging from
