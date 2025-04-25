@@ -72,22 +72,12 @@ filter load_filter(const char* filename)
 
 int main()
 {
-  /* creates and saves filter and then loads it */
-
   static constexpr const char* filename = "filter.bin";
 
-  save_filter(create_filter(), filename);
-  auto f = load_filter(filename);
+  auto f1 = create_filter();
+  save_filter(f1, filename);
+  auto f2 = load_filter(filename);
 
-  /* Check that all the UUIDs used on filter creation are actually contained
-   * in the restored filter.
-   */
-  
-  uuid_generator  gen;
-  std::size_t     n = 0;
-  for(std::size_t i = 0; i < num_elements; ++i) {
-    if (f.may_contain(gen())) ++n;
-  }
-  if (n == num_elements) std::cout << "all elements in filter\n";
-  else                   std::cout << "something went wrong\n";
+  if (f1 == f2) std::cout << "serialization correct\n";
+  else          std::cout << "something went wrong\n";
 }
