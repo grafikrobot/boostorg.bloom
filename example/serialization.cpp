@@ -50,9 +50,7 @@ filter create_filter()
   return f;
 }
 
-static constexpr const char* filename = "filter.bin";
-
-void save_filter(const filter& f)
+void save_filter(const filter& f, const char* filename)
 {
   std::ofstream out(filename, std::ios::binary | std::ios::trunc);
   std::size_t c=f.capacity();
@@ -61,7 +59,7 @@ void save_filter(const filter& f)
   out.write((const char*) s.data(), s.size()); /* save array */
 }
 
-filter load_filter()
+filter load_filter(const char* filename)
 {
   std::ifstream in(filename, std::ios::binary);
   std::size_t c;
@@ -76,8 +74,10 @@ int main()
 {
   /* creates and saves filter and then loads it */
 
-  save_filter(create_filter());
-  auto f = load_filter();
+  static constexpr const char* filename = "filter.bin";
+
+  save_filter(create_filter(), filename);
+  auto f = load_filter(filename);
 
   /* Check that all the UUIDs used on filter creation are actually contained
    * in the restored filter.
