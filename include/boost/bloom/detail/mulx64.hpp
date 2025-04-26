@@ -24,7 +24,7 @@ namespace detail{
 
 #if defined(_MSC_VER)&&defined(_M_X64)&&!defined(__clang__)
 
-__forceinline boost::uint64_t mulx64(
+__forceinline boost::uint64_t umul128(
   boost::uint64_t x,boost::uint64_t y,boost::uint64_t& hi)
 {
   return _umul128(x,y,&hi);
@@ -32,7 +32,7 @@ __forceinline boost::uint64_t mulx64(
 
 #elif defined(_MSC_VER)&&defined(_M_ARM64)&&!defined(__clang__)
 
-__forceinline boost::uint64_t mulx64(
+__forceinline boost::uint64_t umul128(
   boost::uint64_t x,boost::uint64_t y,boost::uint64_t& hi)
 {
   hi=__umulh(x,y);
@@ -41,7 +41,7 @@ __forceinline boost::uint64_t mulx64(
 
 #elif defined(__SIZEOF_INT128__)
 
-inline boost::uint64_t mulx64(
+inline boost::uint64_t umul128(
   boost::uint64_t x,boost::uint64_t y,boost::uint64_t& hi)
 {
   __uint128_t r=(__uint128_t)x*y;
@@ -51,7 +51,7 @@ inline boost::uint64_t mulx64(
 
 #else
 
-inline boost::uint64_t mulx64(
+inline boost::uint64_t umul128(
   boost::uint64_t x,boost::uint64_t y,boost::uint64_t& hi)
 {
   boost::uint64_t x1=(boost::uint32_t)x;
@@ -83,11 +83,11 @@ inline boost::uint64_t mulx64(
 
 #endif
 
-inline boost::uint64_t mulx64_mix(boost::uint64_t x)noexcept
+inline boost::uint64_t mulx64(boost::uint64_t x)noexcept
 {
-  /* multiplier is phi */
+  /* multiplier is 2^64/phi */
   boost::uint64_t hi;
-  boost::uint64_t lo=mulx64(x,0x9E3779B97F4A7C15ull,hi);
+  boost::uint64_t lo=umul128(x,0x9E3779B97F4A7C15ull,hi);
   return hi^lo;
 }
 

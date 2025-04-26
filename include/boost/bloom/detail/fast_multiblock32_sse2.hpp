@@ -57,7 +57,7 @@ struct fast_multiblock32:detail::multiblock_fpr_base<K>
   {
     for(std::size_t i=0;i<k/8;++i){
       mark_m128ix2(x[i],hash,8);
-      hash=detail::mulx64_mix(hash);
+      hash=detail::mulx64(hash);
     }
     if(k%8){
       mark_m128ix2(x[k/8],hash,k%8);
@@ -68,7 +68,7 @@ struct fast_multiblock32:detail::multiblock_fpr_base<K>
   {
     for(std::size_t i=0;i<k/8;++i){
       if(!check_m128ix2(x[i],hash,8))return false;
-      hash=detail::mulx64_mix(hash);
+      hash=detail::mulx64(hash);
     }
     if(k%8){
       if(!check_m128ix2(x[k/8],hash,k%8))return false;

@@ -94,7 +94,7 @@ struct mcg_and_fastrange
   inline std::size_t next_position(boost::uint64_t& hash)const noexcept
   {
     boost::uint64_t hi;
-    hash=mulx64(hash,rng,hi);
+    hash=umul128(hash,rng,hi);
     return (std::size_t)hi;
   }
 

@@ -13,6 +13,7 @@
 
 #include <boost/bloom/block.hpp>
 #include <boost/bloom/detail/core.hpp>
+#include <boost/bloom/detail/mulx64.hpp>
 #include <boost/bloom/detail/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/container_hash/hash.hpp>
@@ -30,10 +31,10 @@ namespace bloom{
 namespace detail{
 
 /* Mixing policies: no_mix_policy is the identity function, and
- * mulx_mix_policy uses the mulx_mix function from
- * <boost/bloom/detail/mulx.hpp>.
+ * mulx64_mix_policy uses the mulx64 function from
+ * <boost/bloom/detail/mulx64.hpp>.
  *
- * filter mixes hash results with mulx64_mix if the hash is not marked as
+ * filter mixes hash results with mulx64 if the hash is not marked as
  * avalanching, i.e. it's not of good quality (see
  * <boost/unordered/hash_traits.hpp>), or if std::size_t is less than 64 bits
  * (mixing policies promote to boost::uint64_t).
@@ -53,7 +54,7 @@ struct mulx64_mix_policy
   template<typename Hash,typename T>
   static inline boost::uint64_t mix(const Hash& h,const T& x)
   {
-    return mulx64_mix((boost::uint64_t)h(x));
+    return mulx64((boost::uint64_t)h(x));
   }
 };
 

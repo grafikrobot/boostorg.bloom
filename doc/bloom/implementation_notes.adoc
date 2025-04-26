@@ -9,10 +9,10 @@ This is the bit-mixing post-process we use to improve the statistical properties
 of the hash function when it doesn't have the avalanching property:
 
 [.text-center]
-{small}stem:[m\leftarrow\text{mulx}(h,C)]{small-end}, +
+{small}stem:[m\leftarrow\text{mul}(h,C)]{small-end}, +
 {small}stem:[h'\leftarrow\text{high}(m)\text{ xor }\text{low}(m)]{small-end},
 
-where {small}stem:[\text{mulx}]{small-end} denotes 128-bit multiplication of two 64-bit factors,
+where {small}stem:[\text{mul}]{small-end} denotes 128-bit multiplication of two 64-bit factors,
 {small}stem:[\text{high}(m)]{small-end} and {small}stem:[\text{low}(m)]{small-end}
 are the high and low 64-bit words of {small}stem:[m]{small-end}, respectively,
 {small}stem:[C=\lfloor 2^{64}/\varphi \rfloor]{small-end} and
@@ -59,7 +59,7 @@ we combine this calculation with the production of {small}stem:[h_{i}]{small-end
 from {small}stem:[h_{i-1}]{small-end} as follows:
 
 [.text-center]
-{small}stem:[m\leftarrow\text{mulx}(h_{i-1},r),]{small-end} +
+{small}stem:[m\leftarrow\text{mul}(h_{i-1},r),]{small-end} +
 {small}stem:[p\leftarrow\lfloor m/2^{64} \rfloor=\text{high}(m),]{small-end} +
 {small}stem:[h_i\leftarrow m \bmod 2^{64}=\text{low}(m).]{small-end}
 

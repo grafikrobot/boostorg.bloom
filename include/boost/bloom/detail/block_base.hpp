@@ -48,7 +48,7 @@ struct block_base
         h>>=shift;
         f(h);
       }
-      hash=detail::mulx64_mix(hash);
+      hash=detail::mulx64(hash);
     }
     auto h=hash;
     for(std::size_t i=0;i<k%rehash_k;++i){

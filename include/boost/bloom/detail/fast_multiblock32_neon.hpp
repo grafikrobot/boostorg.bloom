@@ -49,7 +49,7 @@ struct fast_multiblock32:detail::multiblock_fpr_base<K>
   {
     for(std::size_t i=0;i<k/8;++i){
       mark_uint32x4x2_t(x[i],hash,8);
-      hash=detail::mulx64_mix(hash);
+      hash=detail::mulx64(hash);
     }
     if(k%8){
       mark_uint32x4x2_t(x[k/8],hash,k%8);
@@ -60,7 +60,7 @@ struct fast_multiblock32:detail::multiblock_fpr_base<K>
   {
     for(std::size_t i=0;i<k/8;++i){
       if(!check_uint32x4x2_t(x[i],hash,8))return false;
-      hash=detail::mulx64_mix(hash);
+      hash=detail::mulx64(hash);
     }
     if(k%8){
       if(!check_uint32x4x2_t(x[k/8],hash,k%8))return false;
