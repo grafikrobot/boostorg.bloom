@@ -24,14 +24,16 @@
  * nucleotide.
  */
 
-template<std::size_t N>
+template<std::size_t K>
 struct k_mer
 {
-  static_assert(2 * N <= sizeof(boost::uint64_t) * CHAR_BIT);
+  static_assert(
+    K >= 0 &&
+    2 * K <= sizeof(boost::uint64_t) * CHAR_BIT);
 
   static constexpr std::size_t size()
   {
-    return N;
+    return K;
   }
 
   void reset()
