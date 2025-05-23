@@ -1,9 +1,5 @@
 # Candidate Boost Bloom Library
 
-| 📢 **Review announcement** |
-|-|
-| Candidate Boost.Bloom will be officially reviewed for inclusion into Boost from May 13 to 22, 2025, see the [review schedule page](https://www.boost.org/community/review_schedule.html) for details. All interested people are welcome to participate! |
-
 [![Branch](https://img.shields.io/badge/branch-master-brightgreen.svg)](https://github.com/joaquintides/bloom/tree/master) [![CI](https://github.com/joaquintides/bloom/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/joaquintides/bloom/actions/workflows/ci.yml) [![Drone status](https://img.shields.io/drone/build/joaquintides/bloom/master?server=https%3A%2F%2Fdrone.cpp.al&logo=drone&logoColor=%23CCCCCC&label=CI)](https://drone.cpp.al/joaquintides/bloom) [![Documentation](https://img.shields.io/badge/docs-master-brightgreen.svg)](https://master.bloom.cpp.al/) </br>
 [![Branch](https://img.shields.io/badge/branch-develop-brightgreen.svg)](https://github.com/joaquintides/bloom/tree/develop) [![CI](https://github.com/joaquintides/bloom/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/joaquintides/bloom/actions/workflows/ci.yml) [![Drone status](https://img.shields.io/drone/build/joaquintides/bloom/develop?server=https%3A%2F%2Fdrone.cpp.al&logo=drone&logoColor=%23CCCCCC&label=CI)](https://drone.cpp.al/joaquintides/bloom) [![Documentation](https://img.shields.io/badge/docs-develop-brightgreen.svg)](https://develop.bloom.cpp.al/) </br>
 [![BSL 1.0](https://img.shields.io/badge/license-BSL_1.0-blue.svg)](https://www.boost.org/users/license.html) <img alt="C++11 required" src="https://img.shields.io/badge/standard-C%2b%2b11-blue.svg"> <img alt="Header-only library" src="https://img.shields.io/badge/build-header--only-blue.svg">
