@@ -292,8 +292,9 @@ int main(int argc,char* argv[])
     "    <th>succ.<br/>lkp.</th>\n"
     "    <th>uns.<br/>lkp.</th>\n";
 
+  std::cout<<"<table>\n";
+
   std::cout<<
-    "<table>\n"
     "  <tr>\n"
     "    <th></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
@@ -315,52 +316,9 @@ int main(int argc,char* argv[])
   std::cout<<
     "  <tr>\n"
     "    <th></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>></code></th>\n"
-    "  </tr>\n"
-    "  <tr>\n"
-    "    <th>c</th>\n"<<
-    subheader<<
-    subheader<<
-    subheader<<
-    "  </tr>\n";
-
-  row<filters2< 5,  5,  5>>( 8);
-  row<filters2< 8,  8,  8>>(12);
-  row<filters2<11, 11, 11>>(16);
-  row<filters2<13, 14, 13>>(20);
-
-  std::cout<<
-    "  <tr>\n"
-    "    <th></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>,1></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>,1></code></th>\n"
-    "  </tr>\n"
-    "  <tr>\n"
-    "    <th>c</th>\n"<<
-    subheader<<
-    subheader<<
-    subheader<<
-    "  </tr>\n";
-
-  row<filters3< 5,  5,  5>>( 8);
-  row<filters3< 8,  8,  8>>(12);
-  row<filters3<11, 11, 11>>(16);
-  row<filters3<13, 13, 14>>(20);
-
-  std::cout<<"</table>\n";
-
-  /* filter table with fastrange_and_fixed_mcg */
-
-  std::cout<<
-    "<table>\n"
-    "  <tr>\n"
-    "    <th></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>\n"
-    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;K>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>,1>*</code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
@@ -388,6 +346,25 @@ int main(int argc,char* argv[])
     subheader<<
     "  </tr>\n";
 
+  row<filters2< 5,  5,  5>>( 8);
+  row<filters2< 8,  8,  8>>(12);
+  row<filters2<11, 11, 11>>(16);
+  row<filters2<13, 14, 13>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>>*</code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
   row<filters2b< 5,  5,  5>>( 8);
   row<filters2b< 8,  8,  8>>(12);
   row<filters2b<11, 11, 11>>(16);
@@ -399,6 +376,25 @@ int main(int argc,char* argv[])
     "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>,1></code></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>></code></th>\n"
     "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>,1></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters3< 5,  5,  5>>( 8);
+  row<filters3< 8,  8,  8>>(12);
+  row<filters3<11, 11, 11>>(16);
+  row<filters3<13, 13, 14>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>,1>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>>*</code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>,1>*</code></th>\n"
     "  </tr>\n"
     "  <tr>\n"
     "    <th>c</th>\n"<<
