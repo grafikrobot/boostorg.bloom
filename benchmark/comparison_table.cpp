@@ -230,6 +230,27 @@ using filters3=boost::mp11::mp_list<
   filter<int,1,fast_multiblock64<K3>,1>
 >;
 
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters1b=boost::mp11::mp_list<
+  filter<int,K1,block<unsigned char,1>,0,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,block<boost::uint64_t,K2>,0,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,block<boost::uint64_t,K3>,1,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>
+>;
+
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters2b=boost::mp11::mp_list<
+  filter<int,1,multiblock<boost::uint64_t,K1>,0,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,multiblock<boost::uint64_t,K2>,1,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,fast_multiblock32<K3>,0,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>
+>;
+
+template<std::size_t K1,std::size_t K2,std::size_t K3>
+using filters3b=boost::mp11::mp_list<
+  filter<int,1,fast_multiblock32<K1>,1,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,fast_multiblock64<K2>,0,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>,
+  filter<int,1,fast_multiblock64<K3>,1,boost::hash<int>,std::allocator<int>,detail::fastrange_and_fixed_mcg>
+>;
+
 int main(int argc,char* argv[])
 {
   if(argc<2){
@@ -328,6 +349,68 @@ int main(int argc,char* argv[])
   row<filters3< 8,  8,  8>>(12);
   row<filters3<11, 11, 11>>(16);
   row<filters3<13, 13, 14>>(20);
+
+  std::cout<<"</table>\n";
+
+  /* filter table with fastrange_and_fixed_mcg */
+
+  std::cout<<
+    "<table>\n"
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;K></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,block&lt;uint64_t,K>,1></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters1b< 6,  4,  5>>( 8);
+  row<filters1b< 9,  5,  6>>(12);
+  row<filters1b<11,  6,  7>>(16);
+  row<filters1b<14,  7,  8>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,multiblock&lt;uint64_t,K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters2b< 5,  5,  5>>( 8);
+  row<filters2b< 8,  8,  8>>(12);
+  row<filters2b<11, 11, 11>>(16);
+  row<filters2b<13, 14, 13>>(20);
+
+  std::cout<<
+    "  <tr>\n"
+    "    <th></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock32&lt;K>,1></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>></code></th>\n"
+    "    <th colspan=\"5\"><code>filter&lt;1,fast_multiblock64&lt;K>,1></code></th>\n"
+    "  </tr>\n"
+    "  <tr>\n"
+    "    <th>c</th>\n"<<
+    subheader<<
+    subheader<<
+    subheader<<
+    "  </tr>\n";
+
+  row<filters3b< 5,  5,  5>>( 8);
+  row<filters3b< 8,  8,  8>>(12);
+  row<filters3b<11, 11, 11>>(16);
+  row<filters3b<13, 13, 14>>(20);
 
   std::cout<<"</table>\n";
 }
