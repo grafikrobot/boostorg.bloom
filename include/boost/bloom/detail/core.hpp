@@ -101,6 +101,29 @@ struct mcg_and_fastrange
   boost::uint64_t rng;
 };
 
+
+struct fastrange_and_fixed_mcg
+{
+  constexpr fastrange_and_fixed_mcg(std::size_t m)noexcept:rng{m}{}
+
+  inline constexpr std::size_t range()const noexcept{return (std::size_t)rng;}
+
+  inline void prepare_hash(boost::uint64_t& hash)const noexcept
+  {
+    hash|=1u;
+  }
+
+  inline std::size_t next_position(boost::uint64_t& hash)const noexcept
+  {
+    boost::uint64_t hi;
+    umul128(hash,rng,hi);
+    hash*=6364136223846793005ull;
+    return (std::size_t)hi;
+  }
+
+  boost::uint64_t rng;
+};
+
 /* used_value_size<Subfilter>::value is Subfilter::used_value_size if it
  * exists, or sizeof(Subfilter::value_type) otherwise. This covers the
  * case where a subfilter only operates on the first bytes of its entire
@@ -170,7 +193,8 @@ template<bool B,typename T,typename std::enable_if<!B>::type* =nullptr>
 void swap_if(T&,T&){}
 
 template<
-  std::size_t K,typename Subfilter,std::size_t BucketSize,typename Allocator
+  std::size_t K,typename Subfilter,std::size_t BucketSize,typename Allocator,
+  typename HashStrategy
 >
 class filter_core:empty_value<Allocator,0>
 {
@@ -208,7 +232,7 @@ private:
       1;
   static constexpr std::size_t prefetched_cachelines=
     1+(block_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
-  using hash_strategy=detail::mcg_and_fastrange;
+  using hash_strategy=HashStrategy;
 
 public:
   using allocator_type=Allocator;

@@ -98,7 +98,8 @@ private:
 template<
   typename T,std::size_t K,
   typename Subfilter=block<unsigned char,1>,std::size_t BucketSize=0,
-  typename Hash=boost::hash<T>,typename Allocator=std::allocator<T>
+  typename Hash=boost::hash<T>,typename Allocator=std::allocator<T>,
+  typename HashStrategy=detail::mcg_and_fastrange
 >
 class
 
@@ -108,7 +109,8 @@ __declspec(empty_bases) /* activate EBO with multiple inheritance */
 
 filter:
   detail::filter_core<
-    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
+    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>,
+    HashStrategy
   >,
   empty_value<Hash,0>
 {
@@ -117,7 +119,8 @@ filter:
     std::is_same<T,allocator_value_type_t<Allocator>>::value,
     "Allocator's value_type must be T");
   using super=detail::filter_core<
-    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
+    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>,
+    HashStrategy
   >;
   using mix_policy=typename std::conditional<
     unordered::hash_is_avalanching<Hash>::value&&
