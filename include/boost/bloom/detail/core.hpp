@@ -23,6 +23,7 @@
 #include <boost/throw_exception.hpp>
 #include <cmath>
 #include <cstring>
+#include <climits>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -117,7 +118,15 @@ struct fastrange_and_fixed_mcg
   {
     boost::uint64_t hi;
     umul128(hash,rng,hi);
-    hash*=6364136223846793005ull;
+
+    /* Multipliers from Steele and Vigna (2021) 
+     * https://arxiv.org/pdf/2001.05304 
+     */
+#if ((((SIZE_MAX>>16)>>16)>>16)>>15)!=0 /* 64-bit mode (or higher) */
+    hash*=0xf1357aea2e62a9c5ull;
+#else /* 32-bit mode */
+    hash*=0xe817fb2d;
+#endif
     return (std::size_t)hi;
   }
 
