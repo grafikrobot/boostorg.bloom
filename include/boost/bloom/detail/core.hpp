@@ -19,9 +19,10 @@
 #include <boost/core/allocator_traits.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/core/span.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/throw_exception.hpp>
+#include <climits>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <limits>
 #include <memory>
@@ -60,45 +61,46 @@ namespace detail{
 #pragma warning(disable:4714) /* marked as __forceinline not inlined */
 #endif
 
-/*  mcg_and_fastrange produces (pos,hash') from hash, where
- *   - m=mulx64(hash,range), mulx64 denotes extended multiplication
- *   - pos=high(m)
- *   - hash'=low(m)
- *  pos is uniformly distributed in [0,range) (see
- *  https://arxiv.org/pdf/1805.10941), whereas hash'<-hash is a multiplicative
- *  congruential generator of the form hash'<-hash*rng mod 2^64. This MCG
- *  generates long cycles when the initial value of hash is odd and
- *  rng = +-3 (mod 8), which is why we adjust hash and rng as seen below. As a
- *  result, the low bits of hash' are of poor quality, and the least
- *  significant bit in particular is always one.
+/* fastrange_and_mcg produces (pos,hash') from hash as follows:
+ *   - pos=high(mulx64(hash,range))
+ *   - hash'=c*m
+ * pos is uniformly distributed in [0,range) (see Lemire 2018
+ * https://arxiv.org/pdf/1805.10941), whereas hash'<-hash is a multiplicative
+ * congruential generator using well-behaved multipliers c from Steele and
+ * Vigna 2021 https://arxiv.org/pdf/2001.05304 . To ensure the MCG generates
+ * long cycles the initial value of hash is adjusted to be odd, which implies
+ * that the least significant of hash' is always one. In general, the low bits
+ * of MCG-produced values are of low quality and we don't use them downstream.
  */
 
-struct mcg_and_fastrange
+struct fastrange_and_mcg
 {
-  constexpr mcg_and_fastrange(std::size_t m)noexcept:
-    rng{
-      m+(
-        (m%8<=3)?3-(m%8):
-        (m%8<=5)?5-(m%8):
-                 8-(m%8)+3)
-    }
-    {}
+  constexpr fastrange_and_mcg(std::size_t m)noexcept:rng{m}{}
 
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
   inline constexpr std::size_t range()const noexcept{return (std::size_t)rng;}
 
-  inline void prepare_hash(boost::uint64_t& hash)const noexcept
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
+  inline void prepare_hash(std::uint64_t& hash)const noexcept
   {
     hash|=1u;
   }
 
-  inline std::size_t next_position(boost::uint64_t& hash)const noexcept
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
+  inline std::size_t next_position(std::uint64_t& hash)const noexcept
   {
     boost::uint64_t hi;
-    hash=umul128(hash,rng,hi);
+    umul128(hash,rng,hi);
+
+#if ((((SIZE_MAX>>16)>>16)>>16)>>15)!=0 /* 64-bit mode (or higher) */
+    hash*=0xf1357aea2e62a9c5ull;
+#else /* 32-bit mode */
+    hash*=0xe817fb2d;
+#endif
     return (std::size_t)hi;
   }
 
-  boost::uint64_t rng;
+  std::uint64_t rng;
 };
 
 /* used_value_size<Subfilter>::value is Subfilter::used_value_size if it
@@ -124,7 +126,7 @@ struct used_value_size<
 
 /* GCD with x,p > 1, p a power of two */
 
-inline constexpr std::size_t gcd_pow2(std::size_t x,std::size_t p)
+constexpr std::size_t gcd_pow2(std::size_t x,std::size_t p)
 {
   /* x&-x: maximum power of two dividing x */
   return (x&(0-x))<p?(x&(0-x)):p;
@@ -132,7 +134,7 @@ inline constexpr std::size_t gcd_pow2(std::size_t x,std::size_t p)
 
 /* std::ldexp is not constexpr in C++11 */
 
-inline constexpr double constexpr_ldexp_1_positive(int exp)
+constexpr double constexpr_ldexp_1_positive(int exp)
 {
   return exp==0?1.0:2.0*constexpr_ldexp_1_positive(exp-1);
 }
@@ -140,7 +142,7 @@ inline constexpr double constexpr_ldexp_1_positive(int exp)
 struct filter_array
 {
   unsigned char* data;
-  unsigned char* buckets; /* adjusted from data for proper alignment */
+  unsigned char* array; /* adjusted from data for proper alignment */
 };
 
 struct if_constexpr_void_else{void operator()()const{}};
@@ -170,7 +172,7 @@ template<bool B,typename T,typename std::enable_if<!B>::type* =nullptr>
 void swap_if(T&,T&){}
 
 template<
-  std::size_t K,typename Subfilter,std::size_t BucketSize,typename Allocator
+  std::size_t K,typename Subfilter,std::size_t Stride,typename Allocator
 >
 class filter_core:empty_value<Allocator,0>
 {
@@ -192,23 +194,22 @@ private:
     detail::used_value_size<subfilter>::value;
 
 public:
-  static constexpr std::size_t bucket_size=
-    BucketSize?BucketSize:used_value_size;
+  static constexpr std::size_t stride=Stride?Stride:used_value_size;
   static_assert(
-    bucket_size<=used_value_size,"BucketSize can't exceed the block size");
+    stride<=used_value_size,"Stride can't exceed the block size");
 
 private:
-  static constexpr std::size_t tail_size=sizeof(block_type)-bucket_size;
+  static constexpr std::size_t tail_size=sizeof(block_type)-stride;
   static constexpr bool are_blocks_aligned=
-    (bucket_size%alignof(block_type)==0);
+    (stride%alignof(block_type)==0);
   static constexpr std::size_t cacheline=64; /* unknown at compile time */
   static constexpr std::size_t initial_alignment=
     are_blocks_aligned?
       alignof(block_type)>cacheline?alignof(block_type):cacheline:
       1;
   static constexpr std::size_t prefetched_cachelines=
-    1+(block_size+cacheline-1-gcd_pow2(bucket_size,cacheline))/cacheline;
-  using hash_strategy=detail::mcg_and_fastrange;
+    1+(block_size+cacheline-1-gcd_pow2(stride,cacheline))/cacheline;
+  using hash_strategy=detail::fastrange_and_mcg;
 
 public:
   using allocator_type=Allocator;
@@ -362,15 +363,15 @@ public:
 
   boost::span<unsigned char> array()noexcept
   {
-    return {ar.data?ar.buckets:nullptr,capacity()/CHAR_BIT};
+    return {ar.data?ar.array:nullptr,capacity()/CHAR_BIT};
   }
 
   boost::span<const unsigned char> array()const noexcept
   {
-    return {ar.data?ar.buckets:nullptr,capacity()/CHAR_BIT};
+    return {ar.data?ar.array:nullptr,capacity()/CHAR_BIT};
   }
 
-  BOOST_FORCEINLINE void insert(boost::uint64_t hash)
+  BOOST_FORCEINLINE void insert(std::uint64_t hash)
   {
     hs.prepare_hash(hash);
     for(auto n=k;n--;){
@@ -438,7 +439,7 @@ public:
     return *this;
   }
 
-  BOOST_FORCEINLINE bool may_contain(boost::uint64_t hash)const
+  BOOST_FORCEINLINE bool may_contain(std::uint64_t hash)const
   {
     hs.prepare_hash(hash);
 #if 1
@@ -464,7 +465,7 @@ public:
   {
     if(x.range()!=y.range())return false;
     else if(!x.ar.data)return true;
-    else return std::memcmp(x.ar.buckets,y.ar.buckets,x.used_array_size())==0;
+    else return std::memcmp(x.ar.array,y.ar.array,x.used_array_size())==0;
   }
 
 private:
@@ -475,25 +476,25 @@ private:
 
   static std::size_t requested_range(std::size_t m)
   {
-    if(m>(used_value_size-bucket_size)*CHAR_BIT){
+    if(m>(used_value_size-stride)*CHAR_BIT){
       /* ensures filter_core{f.capacity()}.capacity()==f.capacity() */
-      m-=(used_value_size-bucket_size)*CHAR_BIT;
+      m-=(used_value_size-stride)*CHAR_BIT;
     }
     return
-      (std::numeric_limits<std::size_t>::max)()-m>=bucket_size*CHAR_BIT-1?
-      (m+bucket_size*CHAR_BIT-1)/(bucket_size*CHAR_BIT):
-      m/(bucket_size*CHAR_BIT);
+      (std::numeric_limits<std::size_t>::max)()-m>=stride*CHAR_BIT-1?
+      (m+stride*CHAR_BIT-1)/(stride*CHAR_BIT):
+      m/(stride*CHAR_BIT);
   }
 
   static filter_array new_array(allocator_type& al,std::size_t rng)
   {
     if(rng){
       auto p=allocator_allocate(al,space_for(rng));
-      return {p,buckets_for(p)};
+      return {p,array_for(p)};
     }
     else{
       /* To avoid dynamic allocation for zero capacity or moved-from filters,
-       * we point buckets to a statically allocated dummy array with all bits
+       * we point array to a statically allocated dummy array with all bits
        * set to one. This is good for read operations but not so for write
        * operations, where we need to resort to a null check on
        * filter_array::data.
@@ -502,7 +503,7 @@ private:
       static struct {unsigned char x=-1;}
       dummy[space_for(hash_strategy{0}.range())];
 
-      return {nullptr,buckets_for(reinterpret_cast<unsigned char*>(&dummy))};
+      return {nullptr,array_for(reinterpret_cast<unsigned char*>(&dummy))};
     }
   }
 
@@ -513,13 +514,13 @@ private:
 
   void clear_bytes()noexcept
   {
-    std::memset(ar.buckets,0,used_array_size());
+    std::memset(ar.array,0,used_array_size());
   }
 
   void copy_bytes(const filter_core& x)
   {
     BOOST_ASSERT(range()==x.range());
-    std::memcpy(ar.buckets,x.ar.buckets,used_array_size());
+    std::memcpy(ar.array,x.ar.array,used_array_size());
   }
 
   std::size_t range()const noexcept
@@ -529,14 +530,14 @@ private:
 
   static constexpr std::size_t space_for(std::size_t rng)noexcept
   {
-    return (initial_alignment-1)+rng*bucket_size+tail_size;
+    return (initial_alignment-1)+rng*stride+tail_size;
   }
 
-  static unsigned char* buckets_for(unsigned char* p)noexcept
+  static unsigned char* array_for(unsigned char* p)noexcept
   {
     return p+
-      (boost::uintptr_t(initial_alignment)-
-       boost::uintptr_t(p))%initial_alignment;
+      (std::uintptr_t(initial_alignment)-
+       std::uintptr_t(p))%initial_alignment;
   }
 
   std::size_t used_array_size()const noexcept
@@ -546,7 +547,7 @@ private:
 
   static std::size_t used_array_size(std::size_t rng)noexcept
   {
-    return rng?rng*bucket_size+(used_value_size-bucket_size):0;
+    return rng?rng*stride+(used_value_size-stride):0;
   }
 
   static std::size_t unadjusted_capacity_for(std::size_t n,double fpr)
@@ -609,7 +610,7 @@ private:
 
   static double fpr_for_c(double c)
   {
-    constexpr std::size_t w=(2*used_value_size-bucket_size)*CHAR_BIT;
+    constexpr std::size_t w=(2*used_value_size-stride)*CHAR_BIT;
     const double          lambda=w*k/c;
     const double          loglambda=std::log(lambda);
     double                res=0.0;
@@ -639,20 +640,20 @@ private:
       std::pow(1.0-std::exp(-(double)k_total/c),(double)k_total));
   }
 
-  BOOST_FORCEINLINE bool get(const unsigned char* p,boost::uint64_t hash)const
+  BOOST_FORCEINLINE bool get(const unsigned char* p,std::uint64_t hash)const
   {
     return get(p,hash,std::integral_constant<bool,are_blocks_aligned>{});
   }
 
   BOOST_FORCEINLINE bool get(
-    const unsigned char* p,boost::uint64_t hash,
+    const unsigned char* p,std::uint64_t hash,
     std::true_type /* blocks aligned */)const
   {
     return subfilter::check(*reinterpret_cast<const block_type*>(p),hash);
   }
 
   BOOST_FORCEINLINE bool get(
-    const unsigned char* p,boost::uint64_t hash,
+    const unsigned char* p,std::uint64_t hash,
     std::false_type /* blocks not aligned */)const
   {
     block_type x;
@@ -660,20 +661,20 @@ private:
     return subfilter::check(x,hash);
   }
 
-  BOOST_FORCEINLINE void set(unsigned char* p,boost::uint64_t hash)
+  BOOST_FORCEINLINE void set(unsigned char* p,std::uint64_t hash)
   {
     return set(p,hash,std::integral_constant<bool,are_blocks_aligned>{});
   }
 
   BOOST_FORCEINLINE void set(
-    unsigned char* p,boost::uint64_t hash,
+    unsigned char* p,std::uint64_t hash,
     std::true_type /* blocks aligned */)
   {
     subfilter::mark(*reinterpret_cast<block_type*>(p),hash);
   }
 
   BOOST_FORCEINLINE void set(
-    unsigned char* p,boost::uint64_t hash,
+    unsigned char* p,std::uint64_t hash,
     std::false_type /* blocks not aligned */)
   {
     block_type x;
@@ -683,9 +684,9 @@ private:
   }
 
   BOOST_FORCEINLINE 
-  unsigned char* next_element(boost::uint64_t& h)noexcept
+  unsigned char* next_element(std::uint64_t& h)noexcept
   {
-    auto p=ar.buckets+hs.next_position(h)*bucket_size;
+    auto p=ar.array+hs.next_position(h)*stride;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH_WRITE((unsigned char*)p+i*cacheline);
     }
@@ -693,9 +694,9 @@ private:
   }
 
   BOOST_FORCEINLINE
-  const unsigned char* next_element(boost::uint64_t& h)const noexcept
+  const unsigned char* next_element(std::uint64_t& h)const noexcept
   {
-    auto p=ar.buckets+hs.next_position(h)*bucket_size;
+    auto p=ar.array+hs.next_position(h)*stride;
     for(std::size_t i=0;i<prefetched_cachelines;++i){
       BOOST_BLOOM_PREFETCH((unsigned char*)p+i*cacheline);
     }
@@ -708,9 +709,9 @@ private:
     if(range()!=x.range()){
       BOOST_THROW_EXCEPTION(std::invalid_argument("incompatible filters"));
     }
-    auto first0=ar.buckets,
+    auto first0=ar.array,
          last0=first0+used_array_size(),
-         first1=x.ar.buckets;
+         first1=x.ar.array;
     while(first0!=last0)f(*first0++,*first1++);
   }
 

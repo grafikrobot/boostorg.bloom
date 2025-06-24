@@ -17,10 +17,10 @@
 #include <boost/bloom/detail/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/container_hash/hash.hpp>
+#include <boost/container_hash/hash_is_avalanching.hpp>
 #include <boost/core/allocator_traits.hpp>
 #include <boost/core/empty_value.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/unordered/hash_traits.hpp> // TODO: internalize?
+#include <cstdint>
 #include <initializer_list>
 #include <memory>
 #include <type_traits>
@@ -37,55 +37,27 @@ namespace detail{
  * filter mixes hash results with mulx64 if the hash is not marked as
  * avalanching, i.e. it's not of good quality (see
  * <boost/unordered/hash_traits.hpp>), or if std::size_t is less than 64 bits
- * (mixing policies promote to boost::uint64_t).
+ * (mixing policies promote to std::uint64_t).
  */
 
 struct no_mix_policy
 {
   template<typename Hash,typename T>
-  static inline boost::uint64_t mix(const Hash& h,const T& x)
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
+  static inline std::uint64_t mix(const Hash& h,const T& x)
   {
-    return (boost::uint64_t)h(x);
+    return (std::uint64_t)h(x);
   }
 };
 
 struct mulx64_mix_policy
 {
   template<typename Hash,typename T>
-  static inline boost::uint64_t mix(const Hash& h,const T& x)
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
+  static inline std::uint64_t mix(const Hash& h,const T& x)
   {
-    return mulx64((boost::uint64_t)h(x));
+    return mulx64((std::uint64_t)h(x));
   }
-};
-
-template<typename Allocator,typename T>
-class allocator_constructed
-{
-public:
-  template<typename...Args>
-  allocator_constructed(const Allocator& al_,Args&&... args):al{al_}
-  {
-    allocator_construct(al,std::addressof(u.x),std::forward<Args>(args)...);
-  }
-
-  ~allocator_constructed()
-  {
-    allocator_destroy(al,std::addressof(u.x));
-  }
-
-  const T& value()const noexcept{return u.x;}
-
-private:
-  union uninitialized_value
-  {
-    uninitialized_value(){}
-    ~uninitialized_value(){}
-
-    T x;
-  };
-  
-  uninitialized_value u;
-  Allocator           al;
 };
 
 } /* namespace detail */
@@ -97,8 +69,8 @@ private:
 
 template<
   typename T,std::size_t K,
-  typename Subfilter=block<unsigned char,1>,std::size_t BucketSize=0,
-  typename Hash=boost::hash<T>,typename Allocator=std::allocator<T>
+  typename Subfilter=block<unsigned char,1>,std::size_t Stride=0,
+  typename Hash=boost::hash<T>,typename Allocator=std::allocator<unsigned char>
 >
 class
 
@@ -108,20 +80,18 @@ __declspec(empty_bases) /* activate EBO with multiple inheritance */
 
 filter:
   detail::filter_core<
-    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
+    K,Subfilter,Stride,allocator_rebind_t<Allocator,unsigned char>
   >,
   empty_value<Hash,0>
 {
   BOOST_BLOOM_STATIC_ASSERT_IS_CV_UNQUALIFIED_OBJECT(T);
   static_assert(
-    std::is_same<T,allocator_value_type_t<Allocator>>::value,
-    "Allocator's value_type must be T");
-  using super=detail::filter_core<
-    K,Subfilter,BucketSize,allocator_rebind_t<Allocator,unsigned char>
-  >;
+    std::is_same<unsigned char,allocator_value_type_t<Allocator>>::value,
+    "Allocator's value_type must be unsigned char");
+  using super=detail::filter_core<K,Subfilter,Stride,Allocator>;
   using mix_policy=typename std::conditional<
-    unordered::hash_is_avalanching<Hash>::value&&
-    sizeof(std::size_t)>=sizeof(boost::uint64_t),
+    boost::hash_is_avalanching<Hash>::value&&
+    sizeof(std::size_t)>=sizeof(std::uint64_t),
     detail::no_mix_policy,
     detail::mulx64_mix_policy
   >::type;
@@ -130,7 +100,7 @@ public:
   using value_type=T;
   using super::k;
   using subfilter=typename super::subfilter;
-  using super::bucket_size;
+  using super::stride;
   using hasher=Hash;
   using allocator_type=Allocator;
   using size_type=typename super::size_type;
@@ -258,23 +228,6 @@ public:
   using super::fpr_for;
   using super::array;
 
-  template<typename... Args>
-  BOOST_FORCEINLINE void emplace(Args&&... args)
-  {
-    insert(detail::allocator_constructed<allocator_type,value_type>{
-      get_allocator(),std::forward<Args>(args)...}.value());
-  }
-
-  template<
-    typename U,
-    typename std::enable_if<
-      std::is_same<T,detail::remove_cvref_t<U>>::value>::type* =nullptr
-  >
-  BOOST_FORCEINLINE void emplace(U&& x)
-  {
-    insert(x); /* avoid value_type construction */
-  }
-
   BOOST_FORCEINLINE void insert(const T& x)
   {
     super::insert(hash_for(x));
@@ -292,7 +245,7 @@ public:
   template<typename InputIterator>
   void insert(InputIterator first,InputIterator last)
   {
-    while(first!=last)emplace(*first++);
+    while(first!=last)insert(*first++);
   }
 
   void insert(std::initializer_list<value_type> il)
@@ -346,10 +299,10 @@ public:
 
 private:
   template<
-    typename T1,std::size_t K1,typename S,std::size_t B,typename H,typename A
+    typename T1,std::size_t K1,typename SF,std::size_t S,typename H,typename A
   >
   bool friend operator==(
-    const filter<T1,K1,S,B,H,A>& x,const filter<T1,K1,S,B,H,A>& y);
+    const filter<T1,K1,SF,S,H,A>& x,const filter<T1,K1,SF,S,H,A>& y);
 
   using hash_base=empty_value<Hash,0>;
 
@@ -357,33 +310,34 @@ private:
   Hash& h(){return hash_base::get();}
 
   template<typename U>
-  inline boost::uint64_t hash_for(const U& x)const
+  /* NOLINTNEXTLINE(readability-redundant-inline-specifier) */
+  inline std::uint64_t hash_for(const U& x)const
   {
     return mix_policy::mix(h(),x);
   }
 };
 
 template<
-  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A
+  typename T,std::size_t K,typename SF,std::size_t S,typename H,typename A
 >
-bool operator==(const filter<T,K,S,B,H,A>& x,const filter<T,K,S,B,H,A>& y)
+bool operator==(const filter<T,K,SF,S,H,A>& x,const filter<T,K,SF,S,H,A>& y)
 {
-  using super=typename filter<T,K,S,B,H,A>::super;
+  using super=typename filter<T,K,SF,S,H,A>::super;
   return static_cast<const super&>(x)==static_cast<const super&>(y);
 }
 
 template<
-  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A
+  typename T,std::size_t K,typename SF,std::size_t S,typename H,typename A
 >
-bool operator!=(const filter<T,K,S,B,H,A>& x,const filter<T,K,S,B,H,A>& y)
+bool operator!=(const filter<T,K,SF,S,H,A>& x,const filter<T,K,SF,S,H,A>& y)
 {
   return !(x==y);
 }
 
 template<
-  typename T,std::size_t K,typename S,std::size_t B,typename H,typename A
+  typename T,std::size_t K,typename SF,std::size_t S,typename H,typename A
 >
-void swap(filter<T,K,S,B,H,A>& x,filter<T,K,S,B,H,A>& y)
+void swap(filter<T,K,SF,S,H,A>& x,filter<T,K,SF,S,H,A>& y)
   noexcept(noexcept(x.swap(y)))
 {
   x.swap(y);

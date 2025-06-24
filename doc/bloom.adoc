@@ -26,6 +26,14 @@
 .bordered_table th, .bordered_table td {
   border: 1px solid lightgray;
 }
+
+.formula-center {
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  text-align: center;
+}
 </style>
 ++++
 
@@ -35,7 +43,9 @@ include::bloom/tutorial.adoc[]
 include::bloom/configuration.adoc[]
 include::bloom/benchmarks.adoc[]
 include::bloom/reference.adoc[]
+include::bloom/future_work.adoc[]
 include::bloom/fpr_estimation.adoc[]
 include::bloom/implementation_notes.adoc[]
 include::bloom/release_notes.adoc[]
+include::bloom/acknowledgements.adoc[]
 include::bloom/copyright.adoc[]

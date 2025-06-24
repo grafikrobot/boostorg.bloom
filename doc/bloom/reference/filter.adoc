@@ -34,8 +34,9 @@ namespace bloom{
 
 template<
   typename T, std::size_t K,
-  typename Subfilter = block<unsigned char, 1>, std::size_t BucketSize = 0,
-  typename Hash = boost::hash<T>, typename Allocator = std::allocator<T>
+  typename Subfilter = block<unsigned char, 1>, std::size_t Stride = 0,
+  typename Hash = boost::hash<T>,
+  typename Allocator = std::allocator<unsigned char>
 >
 class filter
 {
@@ -44,7 +45,7 @@ public:
   using value_type                         = T;
   static constexpr std::size_t k           = K;
   using subfilter                          = Subfilter;
-  static constexpr std::size_t xref:filter_bucket_size[bucket_size] = xref:filter_bucket_size[__see below__];
+  static constexpr std::size_t xref:filter_stride[stride]      = xref:filter_stride[__see below__];
   using hasher                             = Hash;
   using allocator_type                     = Allocator;
   using size_type                          = std::size_t;
@@ -120,8 +121,6 @@ public:
   boost::span<const unsigned char> xref:#filter_array[array]() const noexcept;
 
   // modifiers
-  template<typename... Args>
-    void xref:#filter_emplace[emplace](Args&&... args);
   void xref:#filter_insert[insert](const value_type& x);
   template<typename U>
     void xref:#filter_insert[insert](const U& x);
@@ -172,39 +171,52 @@ bit setting/checking into the filter's internal array. The subfilter is invoked 
 per operation on `K` pseudorandomly selected portions of the array (_subarrays_) of width
 `xref:subfilters_used_value_size[_used-value-size_]<Subfilter>`.
 
-|`BucketSize`
+|`Stride`
 | Distance in bytes between the initial positions of consecutive subarrays.
-If `BucketSize` is specified as zero, the actual distance is automatically selected to
+If `Stride` is specified as zero, the actual distance is automatically selected to
 `_used-value-size_<Subfilter>` (non-overlapping subarrays).
-Otherwise, `BucketSize` must be not greater than `_used-value-size_<Subfilter>`.
+Otherwise, `Stride` must be not greater than `_used-value-size_<Subfilter>`.
 
 |`Hash`
 |A https://en.cppreference.com/w/cpp/named_req/Hash[Hash^] type over `T`.
 
 |`Allocator`
-|An https://en.cppreference.com/w/cpp/named_req/Allocator[Allocator^] whose value type is `T`.
+|An https://en.cppreference.com/w/cpp/named_req/Allocator[Allocator^] whose value type is
+`unsigned char`.
 
 |===
 
 Allocation and deallocation of the internal array is done through an internal copy of the
-provided allocator. `value_type` construction/destruction (which only happens in
-`xref:filter_emplace[emplace]`) uses
-`std::allocator_traits<Allocator>::construct`/`destroy`.
+provided allocator. If `xref:filter_stride[stride]` is a
+multiple of _a_ = `alignof(Subfilter::value_type)`, the array is byte-aligned to
+max(64, _a_).
 
-If `link:../../../unordered/doc/html/unordered/reference/hash_traits.html#hash_traits_hash_is_avalanching[boost::unordered::hash_is_avalanching]<Hash>::value`
+If `link:../../../container_hash/doc/html/hash.html#ref_hash_is_avalanchinghash[boost::hash_is_avalanching]<Hash>::value`
 is `true` and `sizeof(std::size_t) >= 8`, 
 the hash function is used as-is; otherwise, a bit-mixing post-processing stage
 is added to increase the quality of hashing at the expense of extra computational cost.
 
+*Exception Safety Guarantees*
+
+Except when explicitly noted, all non-const member functions and associated functions taking
+`boost::bloom::filter` by non-const reference provide the
+https://en.cppreference.com/w/cpp/language/exceptions#Exception_safety[basic exception guarantee^],
+whereas all const member functions and associated functions taking
+`boost::bloom::filter` by const reference provide the 
+https://en.cppreference.com/w/cpp/language/exceptions#Exception_safety[strong exception guarantee^].
+
+Except when explicitly noted, no operation throws an exception unless that exception
+is thrown by the filter's `Hash` or `Allocator` object (if any).
+
 === Types and Constants
 
-[[filter_bucket_size]]
+[[filter_stride]]
 [listing,subs="+macros,+quotes"]
 ----
-static constexpr std::size_t bucket_size;
+static constexpr std::size_t stride;
 ----
 
-Equal to `BucketSize` if that parameter was specified as distinct from zero.
+Equal to `Stride` if that parameter was specified as distinct from zero.
 Otherwise, equal to `xref:subfilters_used_value_size[_used-value-size_]<subfilter>`.
 
 === Constructors
@@ -236,6 +248,7 @@ filter(
 Constructs an empty filter using copies of `h` and `al` as the hash function and allocator, respectively.
 
 [horizontal]
+Preconditions:;; `fpr` is between 0.0 and 1.0.
 Postconditions:;; `capacity() == 0` if `m == 0`, `capacity() >= m` otherwise (first overload). +
 `capacity() == capacity_for(n, fpr)` (second overload).
 
@@ -259,7 +272,8 @@ and inserts the values from `[first, last)` into it.
 
 [horizontal]
 Preconditions:;; `InputIterator` is a https://en.cppreference.com/w/cpp/named_req/InputIterator[LegacyInputIterator^] referring to `value_type`. +
-`[first, last)` is a valid range.
+`[first, last)` is a valid range. +
+`fpr` is between 0.0 and 1.0.
 Postconditions:;; `capacity() == 0` if `m == 0`, `capacity() >= m` otherwise (first overload). +
 `capacity() == capacity_for(n, fpr)` (second overload). +
 `may_contain(x)` for all values `x` from `[first, last)`.
@@ -366,7 +380,6 @@ filter(
 Equivalent to `xref:#filter_iterator_range_constructor[filter](il.begin(), il.end(), m, h, al)` (first overload)
 or `xref:#filter_iterator_range_constructor[filter](il.begin(), il.end(), n, fpr, h, al)` (second overload).
 
-
 ==== Capacity Constructor with Allocator
 
 [listing,subs="+macros,+quotes"]
@@ -377,7 +390,6 @@ filter(size_type n, double fpr, const allocator_type& al);
 
 Equivalent to `xref:#filter_capacity_constructor[filter](m, hasher(), al)` (first overload)
 or `xref:#filter_capacity_constructor[filter](n, fpr, hasher(), al)` (second overload).
-
 
 ==== Initializer List Constructor with Allocator
 
@@ -425,6 +437,7 @@ Preconditions:;; If `pocca`,
 `hasher` is nothrow https://en.cppreference.com/w/cpp/named_req/Swappable[Swappable^].
 Postconditions:;; `*this == x`.
 Returns:;; `*this`.
+Exception Safety:;; Strong.
 
 ==== Move Assignment
 
@@ -449,6 +462,7 @@ Preconditions:;; If `pocma`,
 `hasher` is nothrow https://en.cppreference.com/w/cpp/named_req/Swappable[Swappable^].
 Postconditions:;; `x.capacity() == 0`.
 Returns:;; `*this`.
+Exception Safety:;; Nothrow as indicated, otherwise strong.
 
 ==== Initializer List Assignment
 
@@ -520,20 +534,6 @@ Returns:;; A span over the internal array.
 
 === Modifiers
 
-==== Emplace
-
-[listing,subs="+macros,+quotes"]
-----
-template<typename... Args> void emplace(Args&&... args);
-----
-
-Inserts an element constructed from `std::forward<Args>(args)+++...+++`.
-
-[horizontal]
-Preconditions:;; `value_type` is https://en.cppreference.com/w/cpp/named_req/EmplaceConstructible[EmplaceConstructible^]
-into `filter` from `std::forward<Args>(args)+++...+++`. +
-`value_type` is https://en.cppreference.com/w/cpp/named_req/Erasable[Erasable^] from `filter`.
-
 ==== Insert
 
 [listing,subs="+macros,+quotes"]
@@ -548,6 +548,7 @@ bits of the internal array deterministically selected from the value
 
 [horizontal]
 Postconditions:;; `may_contain(x)`.
+Exception Safety:;; Strong.
 Notes:;; The second overload only participates in overload resolution if
 `hasher::is_transparent` is a valid member typedef.
 
@@ -591,7 +592,7 @@ If `pocs`, swaps the internal allocator with that of `x`.
 Preconditions:;; `pocs || get_allocator() == x.get_allocator()`. +
 If `pocs`, `Allocator` is nothrow https://en.cppreference.com/w/cpp/named_req/Swappable[Swappable^]. +
 `hasher` is nothrow https://en.cppreference.com/w/cpp/named_req/Swappable[Swappable^].
-
+Exception Safety:;; Nothrow.
 
 ==== Clear
 
@@ -615,8 +616,10 @@ equal to `capacity()`, and clears the filter. +
 Second overload: Equivalent to `reset(capacity_for(n, fpr))`.
 
 [horizontal]
+Preconditions:;; `fpr` is between 0.0 and 1.0.
 Postconditions:;; In general, `capacity() >= m`. +
 If `m == 0` or `m == capacity()` or `m == capacity_for(n, fpr)` for some `n` and `fpr`, then `capacity() == m`.
+Exception Safety:;; If `m == 0` or `capacity_for(n, fpr) == 0`, nothrow, otherwise strong.
 
 ==== Combine with AND
 
@@ -630,7 +633,9 @@ otherwise, changes the value of each bit in the internal array with the result o
 doing a logical AND operation of that bit and the corresponding one in `x`.
 
 [horizontal]
+Preconditions:;; The `Hash` objects of `x` and `y` are equivalent.
 Returns:;; `*this`;
+Exception Safety:;; Strong.
 
 ==== Combine with OR
 
@@ -644,7 +649,9 @@ otherwise, changes the value of each bit in the internal array with the result o
 doing a logical OR operation of that bit and the corresponding one in `x`.
 
 [horizontal]
+Preconditions:;; The `Hash` objects of `x` and `y` are equivalent.
 Returns:;; `*this`;
+Exception Safety:;; Strong.
 
 === Observers
 
@@ -698,6 +705,7 @@ bool operator==(
 ----
 
 [horizontal]
+Preconditions:;; The `Hash` objects of `x` and `y` are equivalent.
 Returns:;; `true` iff `x.capacity() == y.capacity()` and 
 `x`++'++s and `y`++'++s internal arrays are bitwise identical.
 
@@ -713,6 +721,7 @@ bool operator!=(
 ----
 
 [horizontal]
+Preconditions:;; The `Hash` objects of `x` and `y` are equivalent.
 Returns:;; `!(x xref:filter_operator[==] y)`.
 
 
@@ -728,3 +737,5 @@ void swap(filter<T, K, S, B, H, A>& x, filter<T, K, S, B, H, A>& y)
 ----
 
 Equivalent to `x.xref:filter_swap[swap](y)`.
+
+'''

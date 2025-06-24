@@ -12,8 +12,9 @@
 #include <boost/config.hpp>
 #include <boost/bloom/detail/constexpr_bit_width.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
-#include <boost/cstdint.hpp>
+#include <boost/bloom/detail/type_traits.hpp>
 #include <cstddef>
+#include <cstdint>
 
 namespace boost{
 namespace bloom{
@@ -24,23 +25,31 @@ namespace detail{
 #pragma warning(disable:4714) /* marked as __forceinline not inlined */
 #endif
 
-// TODO: describe
+/* Validates type Block and provides common looping facilities for block
+ * and multiblock.
+ */
 
 template<typename Block,std::size_t K>
 struct block_base
 {
-  static constexpr std::size_t k=K;
-  static constexpr std::size_t hash_width=sizeof(boost::uint64_t)*CHAR_BIT;
-  static constexpr std::size_t block_width=sizeof(Block)*CHAR_BIT;
   static_assert(
-    (block_width&(block_width-1))==0,
-    "Block's size in bits must be a power of two");
+    is_unsigned_integral_or_extended_unsigned_integral<Block>::value||
+    (
+      is_array_of<
+        Block,is_unsigned_integral_or_extended_unsigned_integral>::value&&
+      is_power_of_two<array_size<Block>::value>::value
+    ),
+    "Block must be an (extended) unsigned integral type or an array T[N] "
+    "with T an (extended) unsigned integral type and N a power of two");
+  static constexpr std::size_t k=K;
+  static constexpr std::size_t hash_width=sizeof(std::uint64_t)*CHAR_BIT;
+  static constexpr std::size_t block_width=sizeof(Block)*CHAR_BIT;
   static constexpr std::size_t mask=block_width-1;
   static constexpr std::size_t shift=constexpr_bit_width(mask);
   static constexpr std::size_t rehash_k=(hash_width-shift)/shift;
 
   template<typename F>
-  static BOOST_FORCEINLINE void loop(boost::uint64_t hash,F f)
+  static BOOST_FORCEINLINE void loop(std::uint64_t hash,F f)
   {
     for(std::size_t i=0;i<k/rehash_k;++i){
       auto h=hash;
@@ -55,6 +64,25 @@ struct block_base
       h>>=shift;
       f(h);
     }
+  }
+
+  template<typename F>
+  static BOOST_FORCEINLINE bool loop_while(std::uint64_t hash,F f)
+  {
+    for(std::size_t i=0;i<k/rehash_k;++i){
+      auto h=hash;
+      for(std::size_t j=0;j<rehash_k;++j){
+        h>>=shift;
+        if(!f(h))return false;
+      }
+      hash=detail::mulx64(hash);
+    }
+    auto h=hash;
+    for(std::size_t i=0;i<k%rehash_k;++i){
+      h>>=shift;
+      if(!f(h))return false;
+    }
+    return true;
   }
 };
 

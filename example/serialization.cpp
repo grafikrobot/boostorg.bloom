@@ -11,8 +11,8 @@
 #include <boost/bloom/filter.hpp>
 #include <boost/bloom/multiblock.hpp>
 #include <boost/core/detail/splitmix64.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <cstdint>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -24,7 +24,7 @@ struct uuid_generator
   boost::uuids::uuid operator()()
   {
     std::uint8_t    data[16];
-    boost::uint64_t x = rng();
+    std::uint64_t x = rng();
     std::memcpy(&data[0], &x, sizeof(x));
     x = rng();
     std::memcpy(&data[8], &x, sizeof(x));
@@ -36,7 +36,7 @@ struct uuid_generator
 };
 
 using filter = boost::bloom::filter<
-  boost::uuids::uuid, 1, boost::bloom::multiblock<boost::uint64_t, 8> >;
+  boost::uuids::uuid, 1, boost::bloom::multiblock<std::uint64_t, 8> >;
 
 static constexpr std::size_t num_elements = 10000;
 
@@ -54,19 +54,19 @@ void save_filter(const filter& f, const char* filename)
 {
   std::ofstream out(filename, std::ios::binary | std::ios::trunc);
   std::size_t c=f.capacity();
-  out.write((const char*) &c, sizeof(c)); /* save capacity (bits) */
+  out.write(reinterpret_cast<const char*>(&c), sizeof(c)); /* save capacity (bits) */
   auto s = f.array();
-  out.write((const char*) s.data(), s.size()); /* save array */
+  out.write(reinterpret_cast<const char*>(s.data()), s.size()); /* save array */
 }
 
 filter load_filter(const char* filename)
 {
   std::ifstream in(filename, std::ios::binary);
   std::size_t c;
-  in.read((char*) &c, sizeof(c));
+  in.read(reinterpret_cast<char*>(&c), sizeof(c));
   filter f(c);
   auto s = f.array();
-  in.read((char*) s.data(), s.size()); /* load array */
+  in.read(reinterpret_cast<char*>(s.data()), s.size()); /* load array */
   return f;
 }
 

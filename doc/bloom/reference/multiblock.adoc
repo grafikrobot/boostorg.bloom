@@ -34,7 +34,7 @@ struct multiblock
 |===
 
 |`Block`
-|An unsigned integral type.
+|An unsigned integral type or an array of 2^`N`^ elements of unsigned integral type.
 
 |`K`
 | Number of bits set/checked per operation. Must be greater than zero.
@@ -43,3 +43,5 @@ struct multiblock
 
 Each of the `K` bits set/checked is located in a different element of the
 `Block[K]` array.
+
+'''
