@@ -9,10 +9,14 @@ import config : requires ;
 
 project
     : requirements
-      # <library>/boost/bloom//boost_bloom
+      <library>/boost/bloom//boost_bloom
       [ requires cxx11_noexcept ] # used as a proxy for C++11 support
     ;
 
 exe basic : basic.cpp ;
 exe genome : genome.cpp : [ requires cxx17_if_constexpr ] ;
-exe serialization : serialization.cpp ;
+exe serialization
+  : serialization.cpp 
+  : <library>/boost/core//boost_core
+    <library>/boost/uuid//boost_uuid
+  ;
