@@ -29,3 +29,9 @@ if(BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
   add_subdirectory(test)
 
 endif()
+
+file(GLOB_RECURSE boost_bloom_all_headers "include/**/*.hpp")
+target_sources(boost_bloom PUBLIC FILE_SET headers TYPE HEADERS FILES "${boost_bloom_all_headers}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/GroupSources.cmake")
+GroupSources(include/boost/bloom "/")
