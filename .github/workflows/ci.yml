@@ -230,7 +230,6 @@ jobs:
           cd ..
           git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          mkdir -p libs/$LIBRARY # remove when/if the library makes it into Boost
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           git submodule update --init tools/boostdep
           python3 tools/boostdep/depinst/depinst.py -I example --git_args "--jobs 3" $LIBRARY
@@ -293,7 +292,6 @@ jobs:
           cd ..
           git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          mkdir -p libs\%LIBRARY% # remove when/if the library makes it into Boost
           xcopy /s /e /q %GITHUB_WORKSPACE% libs\%LIBRARY%\
           git submodule update --init tools/boostdep
           python tools/boostdep/depinst/depinst.py -I example --git_args "--jobs 3" %LIBRARY%
@@ -397,7 +395,6 @@ jobs:
           cd ..
           git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          mkdir -p libs\%LIBRARY% # remove when/if the library makes it into Boost
           xcopy /s /e /q %GITHUB_WORKSPACE% libs\%LIBRARY%\
           git submodule update --init tools/boostdep
           python tools/boostdep/depinst/depinst.py -I benchmark -I example --git_args "--jobs 3" %LIBRARY%
