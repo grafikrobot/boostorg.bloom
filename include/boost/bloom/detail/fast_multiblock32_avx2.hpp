@@ -13,6 +13,7 @@
 #include <boost/bloom/detail/multiblock_fpr_base.hpp>
 #include <boost/bloom/detail/mulx64.hpp>
 #include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 #include <cstddef>
 #include <cstdint>
 
@@ -82,12 +83,22 @@ private:
     x=_mm256_or_si256(x,h);
   }
 
+#if BOOST_WORKAROUND(BOOST_MSVC,<=1900)
+/* 'int': forcing value to bool 'true' or 'false' */
+#pragma warning(push)
+#pragma warning(disable:4800)
+#endif
+
   static BOOST_FORCEINLINE bool check_m256i(
     const __m256i& x,std::uint64_t hash,std::size_t kp)
   {
     __m256i h=make_m256i(hash,kp);
     return _mm256_testc_si256(x,h);
   }
+
+#if BOOST_WORKAROUND(BOOST_MSVC,<=1900)
+#pragma warning(pop) /* C4800 */
+#endif
 };
 
 #if defined(BOOST_MSVC)
