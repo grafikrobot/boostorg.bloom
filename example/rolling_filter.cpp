@@ -31,7 +31,8 @@
  * It's not hard to see that this algorithm implements a filter that remembers
  * only the last s elements inserted, with w * (n-1) < s <= w * n. The
  * resulting FPR oscillates between 1 - (1 - sub_fpr)^(n-1) and 
- * 1 - (1 - sub_fpr)^n, where sub_fpr is the FPR of an individual filter.
+ * 1 - (1 - sub_fpr)^n, where sub_fpr is the FPR of an individual filter
+ * after w insertions.
  */
 
 template<
